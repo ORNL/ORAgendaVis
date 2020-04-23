@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<html>
+  <head>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/d3-array.v2.min.js"></script>
+    <script type="text/javascript" src="./js/timelineChart.js"></script>
+    <style>
+    </style>
+  </head>
+
+  <body>
+    <h1>Topic Timeline Vis</h1>
+    <div id="chart"></div>
+  </body>
+
+  <script>
+    const chartMargin = {top:30, right:10, bottom:10, left:70};
+    const chartHeight = 500;
+    let chartData;
+
+    const createChart = () => {
+      const divWidth = document.getElementById('chart').clientWidth;
+      const chart = timelineChart()
+        .margin(chartMargin)
+        .width(divWidth)
+        .height(chartHeight);
+      d3.select('#chart').call(chart, chartData);
+    };
+
+    d3.csv("data/candidates.csv", d3.autoType)
+      .then(data => {
+        console.log(data);
+        chartData = data;
+        createChart();
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  </script>
+</html>
