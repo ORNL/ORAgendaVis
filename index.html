@@ -53,8 +53,8 @@
   </body>
 
   <script>
-    const chartMargin = {top:30, right:16, bottom:10, left:180};
-    const chartHeight = 600;
+    const chartMargin = {top:30, right:16, bottom:10, left:220};
+    const chartHeight = 640;
     let chartData;
 
     const createChart = () => {
@@ -111,14 +111,14 @@
           spans.map(s => {
             s.name = initiative,
             s.categories = categories,
-            s.start = new Date(s.start, 0, 1);
+            s.start = new Date(s.start, 0, 0);
             s.end = new Date(s.end, 0, 1);
           });
           gaps.map(g => {
             g.name = initiative,
             g.categories = categories,
-            g.start = new Date(g.start, 0, 1);
-            g.end = new Date(g.end, 0, 1);
+            g.start = new Date(g.start, 0, 0);
+            g.end = new Date(g.end, 0, 0);
           });
 
           const yearRange = d3.extent(value, d => d.year);
@@ -127,13 +127,15 @@
             categories, categories,
             spans: spans,
             gaps: gaps,
-            start: new Date(yearRange[0], 0, 1),
-            end: new Date(yearRange[1], 0, 1)
+            start: new Date(yearRange[0], 0, 0),
+            end: new Date(yearRange[1], 0, 0)
           });
         });
         console.log(chartData);
 
-        
+        // chartData = chartData.filter(d => d.categories.length > 1);
+        // chartData = chartData.filter(d => d.categories.includes("biology") || d.categories.includes("climate") || d.categories.includes("environmental"));
+
         createChart();
       })
       .catch(error => {

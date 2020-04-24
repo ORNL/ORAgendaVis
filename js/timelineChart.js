@@ -65,7 +65,9 @@ var timelineChart = function () {
             .join("line")
               .attr("x1", d => 0.5 + x(d))
               .attr("x2", d => 0.5 + x(d))
-              .attr("y2", height));
+              .attr("y2", height))
+          .call(g => g.selectAll(".tick text")
+            .attr("font-size", 14));
         
         g.append("defs")
           .selectAll("linearGradient")
@@ -114,7 +116,7 @@ var timelineChart = function () {
 
         const label = g.append("g")
             .attr("font-family", "sans-serif")
-            .attr("font-size", 12)
+            .attr("font-size", 14)
             .attr("text-anchor", "end")
           .selectAll("text")
           .data(chartData)
