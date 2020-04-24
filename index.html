@@ -93,6 +93,7 @@
             const years = value.map(d => d.year).sort(d3.ascending);
             // console.log(years);
             const spans = [];
+            const gaps = [];
             if (years.length === 1) {
               spans.push({start: years[0], end: years[0] + 1});
             } else {
@@ -100,6 +101,7 @@
               for (let i = 1; i < years.length; i++) {
                 if (years[i] - s[s.length-1] > 1) {
                   spans.push({start: s[0], end: s[s.length-1] + 1});
+                  gaps.push({start:s[s.length-1], end:years[i]});
                   s = [years[i]];
                 } else {
                   s.push(years[i]);
@@ -113,12 +115,18 @@
               s.name = key,
               s.start = new Date(s.start, 0, 1);
               s.end = new Date(s.end, 0, 1);
-            })
+            });
+            gaps.map(g => {
+              g.name = key,
+              g.start = new Date(g.start, 0, 1);
+              g.end = new Date(g.end, 0, 1);
+            });
             // console.log(spans);
             const yearRange = d3.extent(value, d => d.year);
             chartData.push({
               name: key,
               spans: spans,
+              gaps: gaps,
               start: new Date(yearRange[0], 0, 1),
               end: new Date(yearRange[1], 0, 1)
             });

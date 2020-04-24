@@ -45,7 +45,7 @@ var timelineChart = function () {
           .attr('transform', `translate(${margin.left},${margin.top})`);
 
         const x = d3.scaleUtc()
-          .domain([d3.min(chartData, d => d.start), today]).nice()
+          .domain([d3.min(chartData, d => d.start), today])
           .rangeRound([0, width]);
         console.log(x.domain());
         // console.log(x.rangeRound());
@@ -58,12 +58,12 @@ var timelineChart = function () {
         
         const xAxis = g => g
           .call(d3.axisTop(x).ticks(width / 80))
-          // .call(g => g.select(".domain").remove())
+          .call(g => g.select(".domain").remove())
           .call(g => g.append("g")
               .attr("stroke", "white")
               .attr("stroke-width", 2)
             .selectAll("line")
-            .data(x.ticks())
+            .data(x.ticks(d3.timeYear.every(1)))
             .join("line")
               .attr("x1", d => 0.5 + x(d))
               .attr("x2", d => 0.5 + x(d))
@@ -83,8 +83,24 @@ var timelineChart = function () {
         
         // console.log(d3.merge(chartData.map(d => d.spans)));
 
+        const gapLines = g.append("g")
+            .attr("stroke-width", 1)
+            .attr("stroke-linecap", "round")
+            .attr("stroke-linejoin", "round")
+            .attr("stroke-dasharray", "2,2")
+          .selectAll("line")
+          .data(d3.merge(chartData.map(d => d.gaps)))
+          .join("line")
+            .attr("stroke", "#444")
+            .attr("x1", d => x(d.start))
+            .attr("x2", d => x(d.end || x.domain()[1]))
+            .attr("y1", d => y(d.name) + 0.5)
+            .attr("y2", d => y(d.name) + 0.5);
+
         const line = g.append("g")
             .attr("stroke-width", 2)
+            .attr("stroke-linecap", "round")
+            .attr("stroke-linejoin", "round")
           .selectAll("line")
           // .data(chartData)
           .data(d3.merge(chartData.map(d => d.spans)))
