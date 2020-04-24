@@ -12,11 +12,14 @@ var timelineChart = function () {
     Duration: (a, b) => d3.descending((a.end || today) - a.start, (b.end || today) - b.start)
   });
   // const today = new Date(Date.UTC(2021, 0, 1));
-  let endDate = new Date(Date.UTC(2021, 0, 1));
+  // let endDate = new Date(Date.UTC(2021, 0));
+  let endDate;
 
   function chart(selection, data) {
-    chartData = data.slice().sort(orders.Start);
-    // chartData = data.slice();
+    // chartData = data.slice().sort(orders.Start);
+    endDate = d3.max(data, d => d.end);
+    console.log(endDate);
+    chartData = data.slice();
     chartDiv = selection;
     drawChart();
   }
@@ -67,7 +70,7 @@ var timelineChart = function () {
               .attr("x2", d => 0.5 + x(d))
               .attr("y2", height))
           .call(g => g.selectAll(".tick text")
-            .attr("font-size", 14));
+            .attr("font-size", 12));
         
         g.append("defs")
           .selectAll("linearGradient")
@@ -124,7 +127,13 @@ var timelineChart = function () {
             .attr("x", d => x(d.start) - 6)
             .attr("y", d => y(d.name))
             .attr("dy", "0.35em")
-            .attr("fill-opacity", d => d.end === null ? null : 0.6)
+            .attr("fill-opacity", d => {
+              // console.log(d.end.getFullYear());
+              // console.log(x.domain()[1].getFullYear());
+              return d.end.getFullYear() === x.domain()[1].getFullYear() ? null : 0.6
+            })
+            .attr("font-weight", d => d.end.getFullYear() === x.domain()[1].getFullYear() ? "bold" : null)
+            // .attr("fill-opacity", d => d.end === null ? null : 0.6)
             .text(d => d.name);
 
         // const dot = g.append("g")

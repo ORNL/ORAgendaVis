@@ -78,34 +78,48 @@
 
     d3.csv("data/initiatives-chad.csv", d3.autoType)
       .then(data => {
-        data = data.map(d => {
-          d.chad = d.chad.toLowerCase();
-          return d;
-        });
+        // data = data.map(d => {
+        //   d.chad = d.chad.toLowerCase();
+        //   return d;
+        // });
+
         const initiatives = d3.group(data, d => d.chad);
         chartData = [];
+        
         initiatives.forEach((value, initiative) => {
 
           const categories = d3.csvParseRows(initiative)[0];
 
-          const years = value.map(d => d.year).sort(d3.ascending);
+          const years = [...new Set(value.map(d => d.year).sort(d3.ascending))];
 
           const spans = [];
           const gaps = [];
           if (years.length === 1) {
-            spans.push({start: years[0], end: years[0] + 1});
+            spans.push({
+              start: years[0], 
+              end: years[0] + 1
+            });
           } else {
             let s = [years[0]];
             for (let i = 1; i < years.length; i++) {
               if (years[i] - s[s.length-1] > 1) {
-                spans.push({start: s[0], end: s[s.length-1] + 1});
-                gaps.push({start:s[s.length-1], end:years[i]});
+                spans.push({
+                  start: s[0], 
+                  end: s[s.length-1] + 1
+                });
+                gaps.push({
+                  start:s[s.length-1] + 1, 
+                  end:years[i]
+                });
                 s = [years[i]];
               } else {
                 s.push(years[i]);
               }
             }
-            spans.push({start: s[0], end: s[s.length-1] + 1});
+            spans.push({
+              start: s[0], 
+              end: s[s.length-1] + 1
+            });
           }
           
           spans.map(s => {
@@ -127,19 +141,137 @@
             categories, categories,
             spans: spans,
             gaps: gaps,
-            start: new Date(yearRange[0], 0, 0),
-            end: new Date(yearRange[1], 0, 0)
+            start: new Date(yearRange[0], 0),
+            end: new Date(yearRange[1] + 1, 0)
           });
         });
-        console.log(chartData);
+        // console.log(chartData);
 
         // chartData = chartData.filter(d => d.categories.length > 1);
         // chartData = chartData.filter(d => d.categories.includes("biology") || d.categories.includes("climate") || d.categories.includes("environmental"));
+
+        console.log(chartData.length);
+        chartData = sortInitiatives(chartData);
+        console.log(chartData.length);
+        console.log(chartData);
 
         createChart();
       })
       .catch(error => {
         console.log(error);
       });
+
+      const orders = ({
+        Start: (a, b) => d3.ascending(a.start, b.start),
+        End: (a, b) => d3.ascending(a.end || today, b.end || today) || d3.ascending(a.start, b.start),
+        Duration: (a, b) => d3.descending((a.end || today) - a.start, (b.end || today) - b.start)
+      });
+
+      const getInitiativesWithKeyword = (data, keyword) => {
+        initiatives = [];
+        data.forEach(d => {
+          if (!initiatives.includes(d)) {
+            if (d.name.includes(keyword)) {
+              initiatives.push(d);
+            }
+          }
+        });
+        return initiatives;
+      }
+      const sortInitiatives = (data) => {
+        var initiativePriorities = [
+          "neutrons",
+          "hpc",
+          "materials",
+          "nuclear",
+          "isotopes",
+          "biology",
+          "environmental",
+          "climate",
+          "manufacturing",
+          "national security",
+          "tech transfer",
+          "science culture"
+        ];
+        var newData = [];
+
+        initiativePriorities.forEach(keyword => {
+          let initiatives = getInitiativesWithKeyword(data, keyword);
+          initiatives.sort(orders.Start);
+          if (initiatives.length > 0) {
+            initiatives.forEach(d => {
+              if (!newData.includes(d)) {
+                newData.push(d);
+              }
+            });
+          }  
+        });
+
+        // var initiatives = getInitiativesWithKeyword(data, "neutrons");
+        // if (initiatives.length > 0) {
+        //   initiatives.forEach(d => {
+        //     if (!newData.includes(d)) {
+        //       newData.push(d);
+        //     }
+        //   });
+        // }
+
+        // var initiatives = getInitiativesWithKeyword(data, "hpc");
+        // if (initiatives.length > 0) {
+        //   initiatives.forEach(d => {
+        //     if (!newData.includes(d)) {
+        //       newData.push(d);
+        //     }
+        //   });
+        // }
+
+        // var initiatives = getInitiativesWithKeyword(data, "materials");
+        // if (initiatives.length > 0) {
+        //   initiatives.forEach(d => {
+        //     if (!newData.includes(d)) {
+        //       newData.push(d);
+        //     }
+        //   });
+        // }
+
+        // data.forEach(d => {
+        //   if (!newData.includes(d)) {
+        //     if (d.name.includes("neutrons")) {
+        //       newData.push(d);
+        //     }
+        //   }
+        // });
+
+        // data.forEach(d => {
+        //   if (!newData.includes(d)) {
+        //     if (d.name.includes("hpc")) {
+        //       newData.push(d);
+        //     }
+        //   }
+        // });
+
+        let unprioritizedInitiatives = [];
+        data.forEach(d => {
+          if (!newData.includes(d)) {
+            unprioritizedInitiatives.push(d);
+          }
+        });
+        unprioritizedInitiatives.sort(orders.Start);
+
+        // let unprioritizedInitiatives = data.map(d => !newData.includes(d)).sort(orders.Start);
+        console.log(unprioritizedInitiatives.length);
+        console.log(newData.length);
+        unprioritizedInitiatives.forEach(d => {
+          newData.push(d);
+        });
+
+        // data.forEach(d => {
+        //   if (!newData.includes(d)) {
+        //     newData.push(d);
+        //   }
+        // });
+        
+        return newData;
+      }
   </script>
 </html>
