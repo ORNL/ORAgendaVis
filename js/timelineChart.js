@@ -11,14 +11,12 @@ var timelineChart = function () {
     End: (a, b) => d3.ascending(a.end || today, b.end || today) || d3.ascending(a.start, b.start),
     Duration: (a, b) => d3.descending((a.end || today) - a.start, (b.end || today) - b.start)
   });
-  const today = new Date(Date.UTC(2021, 0, 1));
+  // const today = new Date(Date.UTC(2021, 0, 1));
+  let endDate = new Date(Date.UTC(2021, 0, 1));
 
   function chart(selection, data) {
     chartData = data.slice().sort(orders.Start);
-
-    console.log(`width: ${width}`);
-    console.log(chartData);
-    console.log(selection);
+    // chartData = data.slice();
     chartDiv = selection;
     drawChart();
   }
@@ -35,7 +33,7 @@ var timelineChart = function () {
     if (chartData) {
       chartDiv.selectAll('*').remove();
       if (chartData) {      
-        console.log(today);
+        console.log(endDate);
 
         const svg = chartDiv.append('svg')
           .attr('width', width + margin.left + margin.right)
@@ -45,7 +43,7 @@ var timelineChart = function () {
           .attr('transform', `translate(${margin.left},${margin.top})`);
 
         const x = d3.scaleUtc()
-          .domain([d3.min(chartData, d => d.start), today])
+          .domain([d3.min(chartData, d => d.start), endDate])
           .rangeRound([0, width]);
         console.log(x.domain());
         // console.log(x.rangeRound());

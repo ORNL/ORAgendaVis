@@ -38,9 +38,7 @@
         <td id="logo"><img src="image/vista-logo.png" height=80 alt="ORNL VISTA Vis Lab"></img></td>
       </tr>
     </table>
-    <!-- <h2>ORNL Lab Agenda</h2> -->
     <div id="chart"></div>
-    <!-- <img src="image/vista-logo.png" height=80 alt="ORNL VISTA Vis Lab"></img> -->
 
     <br/><br/>
     <center>
@@ -80,59 +78,62 @@
 
     d3.csv("data/initiatives-chad.csv", d3.autoType)
       .then(data => {
-        // console.log(data);
         data = data.map(d => {
           d.chad = d.chad.toLowerCase();
           return d;
         });
-        const categories = d3.group(data, d => d.chad);
-        // console.log(categories);
+        const initiatives = d3.group(data, d => d.chad);
         chartData = [];
-        categories.forEach((value, key) => {
-          // if (key.includes('climate') || key.includes('biology') || key.includes('biological') || key.includes('environmental')) {
-            const years = value.map(d => d.year).sort(d3.ascending);
-            // console.log(years);
-            const spans = [];
-            const gaps = [];
-            if (years.length === 1) {
-              spans.push({start: years[0], end: years[0] + 1});
-            } else {
-              let s = [years[0]];
-              for (let i = 1; i < years.length; i++) {
-                if (years[i] - s[s.length-1] > 1) {
-                  spans.push({start: s[0], end: s[s.length-1] + 1});
-                  gaps.push({start:s[s.length-1], end:years[i]});
-                  s = [years[i]];
-                } else {
-                  s.push(years[i]);
-                }
+        initiatives.forEach((value, initiative) => {
+
+          const categories = d3.csvParseRows(initiative)[0];
+
+          const years = value.map(d => d.year).sort(d3.ascending);
+
+          const spans = [];
+          const gaps = [];
+          if (years.length === 1) {
+            spans.push({start: years[0], end: years[0] + 1});
+          } else {
+            let s = [years[0]];
+            for (let i = 1; i < years.length; i++) {
+              if (years[i] - s[s.length-1] > 1) {
+                spans.push({start: s[0], end: s[s.length-1] + 1});
+                gaps.push({start:s[s.length-1], end:years[i]});
+                s = [years[i]];
+              } else {
+                s.push(years[i]);
               }
-              spans.push({start: s[0], end: s[s.length-1] + 1});
             }
-            
-            // console.log(spans);
-            spans.map(s => {
-              s.name = key,
-              s.start = new Date(s.start, 0, 1);
-              s.end = new Date(s.end, 0, 1);
-            });
-            gaps.map(g => {
-              g.name = key,
-              g.start = new Date(g.start, 0, 1);
-              g.end = new Date(g.end, 0, 1);
-            });
-            // console.log(spans);
-            const yearRange = d3.extent(value, d => d.year);
-            chartData.push({
-              name: key,
-              spans: spans,
-              gaps: gaps,
-              start: new Date(yearRange[0], 0, 1),
-              end: new Date(yearRange[1], 0, 1)
-            });
-          // }
+            spans.push({start: s[0], end: s[s.length-1] + 1});
+          }
+          
+          spans.map(s => {
+            s.name = initiative,
+            s.categories = categories,
+            s.start = new Date(s.start, 0, 1);
+            s.end = new Date(s.end, 0, 1);
+          });
+          gaps.map(g => {
+            g.name = initiative,
+            g.categories = categories,
+            g.start = new Date(g.start, 0, 1);
+            g.end = new Date(g.end, 0, 1);
+          });
+
+          const yearRange = d3.extent(value, d => d.year);
+          chartData.push({
+            name: initiative,
+            categories, categories,
+            spans: spans,
+            gaps: gaps,
+            start: new Date(yearRange[0], 0, 1),
+            end: new Date(yearRange[1], 0, 1)
+          });
         });
         console.log(chartData);
+
+        
         createChart();
       })
       .catch(error => {
