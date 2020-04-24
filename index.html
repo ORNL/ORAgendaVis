@@ -5,18 +5,45 @@
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://d3js.org/d3-array.v2.min.js"></script>
     <script type="text/javascript" src="./js/timelineChart.js"></script>
+
+    <link rel="apple-touch-icon" href="./favicon.png">
+    <link rel="icon" type="image/png" href="./favicon.png">
+    <link rel="icon" type="image/png" href="./favicon.png">
+    <link rel="shortcut icon" href="./favicon.png">
+    
     <style>
+      body {
+        font: 12px sans-serif;
+        margin: 4px 20px 0px 20px;
+        /* background: gray; */
+        background-color: whitesmoke;
+      }
+
+      table {
+        width: 100%;
+      }
+
+      #logo {
+        text-align: right;
+      }
     </style>
   </head>
 
   <body>
-    <h1>Topic Timeline Vis</h1>
+    <table>
+      <tr>
+        <td><h1>ORNL Lab Agenda Initiatives (2001-2020)</h1></td>
+        <td id="logo"><img src="image/vista-logo.png" height=80 alt="ORNL VISTA Vis Lab"></img></td>
+      </tr>
+    </table>
+    <!-- <h2>ORNL Lab Agenda</h2> -->
     <div id="chart"></div>
+    <!-- <img src="image/vista-logo.png" height=80 alt="ORNL VISTA Vis Lab"></img> -->
   </body>
 
   <script>
-    const chartMargin = {top:30, right:10, bottom:10, left:70};
-    const chartHeight = 500;
+    const chartMargin = {top:30, right:16, bottom:10, left:160};
+    const chartHeight = 600;
     let chartData;
 
     const createChart = () => {
@@ -28,10 +55,63 @@
       d3.select('#chart').call(chart, chartData);
     };
 
-    d3.csv("data/candidates.csv", d3.autoType)
+    // d3.csv("data/candidates.csv", d3.autoType)
+    //   .then(data => {
+    //     console.log(data);
+    //     chartData = data;
+    //     createChart();
+    //   })
+    //   .catch(error => {
+    //     console.log(error);
+    //   });
+
+    d3.csv("data/initiatives-chad.csv", d3.autoType)
       .then(data => {
-        console.log(data);
-        chartData = data;
+        // console.log(data);
+        data = data.map(d => {
+          d.chad = d.chad.toLowerCase();
+          return d;
+        });
+        const categories = d3.group(data, d => d.chad);
+        // console.log(categories);
+        chartData = [];
+        categories.forEach((value, key) => {
+          // if (key.includes('climate') || key.includes('biology') || key.includes('biological') || key.includes('environmental')) {
+            const years = value.map(d => d.year).sort(d3.ascending);
+            // console.log(years);
+            const spans = [];
+            if (years.length === 1) {
+              spans.push({start: years[0], end: years[0] + 1});
+            } else {
+              let s = [years[0]];
+              for (let i = 1; i < years.length; i++) {
+                if (years[i] - s[s.length-1] > 1) {
+                  spans.push({start: s[0], end: s[s.length-1] + 1});
+                  s = [years[i]];
+                } else {
+                  s.push(years[i]);
+                }
+              }
+              spans.push({start: s[0], end: s[s.length-1] + 1});
+            }
+            
+            // console.log(spans);
+            spans.map(s => {
+              s.name = key,
+              s.start = new Date(s.start, 0, 1);
+              s.end = new Date(s.end, 0, 1);
+            })
+            // console.log(spans);
+            const yearRange = d3.extent(value, d => d.year);
+            chartData.push({
+              name: key,
+              spans: spans,
+              start: new Date(yearRange[0], 0, 1),
+              end: new Date(yearRange[1], 0, 1)
+            });
+          // }
+        });
+        console.log(chartData);
         createChart();
       })
       .catch(error => {

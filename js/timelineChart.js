@@ -8,13 +8,13 @@ var timelineChart = function () {
 
   const orders = ({
     Start: (a, b) => d3.ascending(a.start, b.start),
-    End: (a, b) => d3.descending(a.end || today, b.end || today) || d3.descending(a.start, b.start),
+    End: (a, b) => d3.ascending(a.end || today, b.end || today) || d3.ascending(a.start, b.start),
     Duration: (a, b) => d3.descending((a.end || today) - a.start, (b.end || today) - b.start)
   });
-  const today = new Date(Date.UTC(2020, 10, 1));
+  const today = new Date(Date.UTC(2021, 0, 1));
 
   function chart(selection, data) {
-    chartData = data.slice().sort(orders.End);
+    chartData = data.slice().sort(orders.Start);
 
     console.log(`width: ${width}`);
     console.log(chartData);
@@ -45,7 +45,7 @@ var timelineChart = function () {
           .attr('transform', `translate(${margin.left},${margin.top})`);
 
         const x = d3.scaleUtc()
-          .domain([d3.min(chartData, d => d.start), today])
+          .domain([d3.min(chartData, d => d.start), today]).nice()
           .rangeRound([0, width]);
         console.log(x.domain());
         // console.log(x.rangeRound());
@@ -58,7 +58,7 @@ var timelineChart = function () {
         
         const xAxis = g => g
           .call(d3.axisTop(x).ticks(width / 80))
-          .call(g => g.select(".domain").remove())
+          // .call(g => g.select(".domain").remove())
           .call(g => g.append("g")
               .attr("stroke", "white")
               .attr("stroke-width", 2)
@@ -81,10 +81,13 @@ var timelineChart = function () {
             .call(g => g.append("stop").attr("stop-color", "currentColor"))
             .call(g => g.append("stop").attr("offset", "100%").attr("stop-color", "#ccc"));
         
+        // console.log(d3.merge(chartData.map(d => d.spans)));
+
         const line = g.append("g")
             .attr("stroke-width", 2)
           .selectAll("line")
-          .data(chartData)
+          // .data(chartData)
+          .data(d3.merge(chartData.map(d => d.spans)))
           .join("line")
             .attr("stroke", "black")
             .attr("x1", d => x(d.start))
@@ -97,7 +100,7 @@ var timelineChart = function () {
 
         const label = g.append("g")
             .attr("font-family", "sans-serif")
-            .attr("font-size", 10)
+            .attr("font-size", 12)
             .attr("text-anchor", "end")
           .selectAll("text")
           .data(chartData)
@@ -108,14 +111,14 @@ var timelineChart = function () {
             .attr("fill-opacity", d => d.end === null ? null : 0.6)
             .text(d => d.name);
 
-        const dot = g.append("g")
-            .attr("fill", "black")
-          .selectAll("circle")
-          .data(chartData.filter(d => d.end != null))
-          .join("circle")
-            .attr("cx", d => x(d.end))
-            .attr("cy", d => y(d.name) + 0.5)
-            .attr("r", 2);
+        // const dot = g.append("g")
+        //     .attr("fill", "black")
+        //   .selectAll("circle")
+        //   .data(chartData.filter(d => d.end != null))
+        //   .join("circle")
+        //     .attr("cx", d => x(d.end))
+        //     .attr("cy", d => y(d.name) + 0.5)
+        //     .attr("r", 2);
 
         
 
