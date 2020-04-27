@@ -90,7 +90,7 @@
       return [...related];
     }
 
-    d3.csv("data/initiatives-chad.csv", d3.autoType)
+    d3.csv("data/initiatives-v4.csv", d3.autoType)
       .then(data => {
         // data = data.map(d => {
         //   d.chad = d.chad.toLowerCase();
@@ -99,7 +99,7 @@
 
         // data = data.filter(d => d.chad.includes("biology") || d.chad.includes("climate") || d.chad.includes("environmental"));
 
-        const groupedInitiatives = d3.group(data, d => d.chad);
+        const groupedInitiatives = d3.group(data, d => d.category);
         console.log(groupedInitiatives);
 
         const yearExtent = d3.extent(data, d => d.year);
@@ -234,7 +234,10 @@
           // } else {
           //   return d3.ascending(a.start, b.start);
           // }
-        })
+        });
+
+
+
         chartData = themes;
         createChart();
         // const themes = [...new Set(d3.merge(data.map(d => d3.csvParseRows(d.chad)[0].map(d => d.trim()))))];
