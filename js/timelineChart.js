@@ -83,15 +83,15 @@ var timelineChart = function () {
             .attr("x1", d => x(d.start))
             .attr("x2", d => x(d.end))
             .call(g => g.append("stop").attr("stop-color", "black"))
-            .call(g => g.append("stop").attr("offset", "100%").attr("stop-color", "#ccc"));
+            .call(g => g.append("stop").attr("offset", "100%").attr("stop-color", "#aaa"));
         
         // console.log(d3.merge(chartData.map(d => d.spans)));
 
         const gapLines = g.append("g")
             .attr("stroke-width", 1.5)
-            .attr("stroke-linecap", "round")
+            // .attr("stroke-linecap", "round")
             .attr("stroke-linejoin", "round")
-            .attr("stroke-dasharray", "1,4")
+            .attr("stroke-dasharray", "2,4")
             .attr("stroke", "#777")
           .selectAll("line")
           // .data(d3.merge(chartData.map(d => d.gaps)))
@@ -104,15 +104,16 @@ var timelineChart = function () {
 
         const spanLines = g.append("g")
             .attr("stroke-width", 2)
-            .attr("stroke-linecap", "round")
+            // .attr("stroke-linecap", "round")
             .attr("stroke-linejoin", "round")
           .selectAll("line")
           // .data(chartData)
           // .data(d3.merge(chartData.map(d => d.spans.slice())))
           .data(d3.merge(chartData.map(d => d.spans.slice().map(s => { return {name: d.name, start: s.start, end: s.end, gradientId: d.gradientId}; }))))
           .join("line")
-            .attr("stroke", "black")
-            // .attr("stroke", d => d.end === x.domain()[1] ? "black" : d.gradientId)
+            // .attr("stroke", "black")
+            .attr("stroke", d => d.gradientId ? `url(#${d.gradientId})` : "black")
+            // .attr("stroke", d => d.end === x.domain()[1] ? "black" : `url(#${d.gradientId})`)
             // .attr("stroke-opacity", d => d.end === x.domain()[1] ? null : 0.7)
             .attr("x1", d => x(d.start))
             .attr("x2", d => x(d.end || x.domain()[1]))
@@ -145,7 +146,7 @@ var timelineChart = function () {
           .join("circle")
             .attr("cx", d => x(d.end))
             .attr("cy", d => y(d.name) + 0.5)
-            .attr("r", 3);
+            .attr("r", 2);
 
         
 
