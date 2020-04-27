@@ -211,17 +211,47 @@
         // chartData = orderedThemes;
         // createChart();
 
-        themes.sort((a,b) => {
-          if (a.end > yearExtent[1] && b.end > yearExtent[1]) {
+        // themes.sort((a,b) => {
+        //   if (a.end > yearExtent[1] && b.end > yearExtent[1]) {
+        //     if (a.start === b.start) {
+        //       return d3.ascending(a.end - a.start, b.end - b.start);
+        //     }
+        //     return d3.ascending(a.start, b.start);
+        //   } else {
+        //     if (a.end > yearExtent[1]) {
+        //       return -1;
+        //     } else if (b.end > yearExtent[1]) {
+        //       return 1;
+        //     } else {
+        //       if (a.start === b.start) {
+        //         return d3.descending(a.end - a.start, b.end - b.start);
+        //       }
+        //       return d3.ascending(a.start, b.start);
+        //     }
+        //   }
+        // });
+
+        const low_priority_themes = [
+          'tech transfer',
+          'science & innovation culture',
+          'university partnerships',
+          'graduate education',
+          'cross cutting initiatives',
+          'human capital',
+          'emerging R&D'
+        ];
+
+        const sortThemes = (a, b) => {
+          if (low_priority_themes.includes(a.name) && low_priority_themes.includes(b.name)) {
             if (a.start === b.start) {
-              return d3.ascending(a.end - a.start, b.end - b.start);
+              return d3.descending(a.end - a.start, b.end - b.start);
             }
             return d3.ascending(a.start, b.start);
           } else {
-            if (a.end > yearExtent[1]) {
-              return -1;
-            } else if (b.end > yearExtent[1]) {
+            if (low_priority_themes.includes(a.name)) {
               return 1;
+            } else if (low_priority_themes.includes(b.name)) {
+              return -1;
             } else {
               if (a.start === b.start) {
                 return d3.descending(a.end - a.start, b.end - b.start);
@@ -229,16 +259,14 @@
               return d3.ascending(a.start, b.start);
             }
           }
-          // if (a.start === b.start) {
-          //   return d3.ascending((a.end - a.start), (b.end - b.start));
-          // } else {
-          //   return d3.ascending(a.start, b.start);
-          // }
-        });
+        }
+        var activeThemes = themes.filter(theme => theme.end > yearExtent[1]);
+        activeThemes.sort(sortThemes);
+        const inactiveThemes = themes.filter(theme => !(theme.end > yearExtent[1]));
+        inactiveThemes.sort(sortThemes);
 
-
-
-        chartData = themes;
+        chartData = activeThemes.concat(inactiveThemes);
+        console.log(chartData);
         createChart();
         // const themes = [...new Set(d3.merge(data.map(d => d3.csvParseRows(d.chad)[0].map(d => d.trim()))))];
 

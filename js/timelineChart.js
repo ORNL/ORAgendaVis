@@ -25,6 +25,7 @@ var timelineChart = function () {
   }
 
   var count = 0;
+
   function getID(name) {
     const id = "0-" + (name === null ? "" : name + "-") + ++count;
     console.log(id);
@@ -69,16 +70,19 @@ var timelineChart = function () {
           .call(g => g.selectAll(".tick text")
             .attr("font-size", 12));
         
+        console.log(chartData.filter(d => d.end !== x.domain()[1]));
+
         g.append("defs")
           .selectAll("linearGradient")
-          .data(chartData.filter(d => d.end !== null))
+          // .data(chartData.filter(d => d.end !== null))
+          .data(chartData.filter(d => d.end !== x.domain()[1]))
           .join("linearGradient")
-            .attr("id", getID("gradient"))
+            .attr("id", d => (d.gradientId = getID("gradient")))
             // .attr("id", d => (d.gradientId = DOM.uid("gradient")).id)
             .attr("gradientUnits", "userSpaceOnUse")
             .attr("x1", d => x(d.start))
             .attr("x2", d => x(d.end))
-            .call(g => g.append("stop").attr("stop-color", "currentColor"))
+            .call(g => g.append("stop").attr("stop-color", "black"))
             .call(g => g.append("stop").attr("offset", "100%").attr("stop-color", "#ccc"));
         
         // console.log(d3.merge(chartData.map(d => d.spans)));
@@ -91,7 +95,7 @@ var timelineChart = function () {
             .attr("stroke", "#777")
           .selectAll("line")
           // .data(d3.merge(chartData.map(d => d.gaps)))
-          .data(d3.merge(chartData.map(d => d.gaps.slice().map(s => { return {name: d.name, start: s.start, end: s.end}; }))))
+          .data(d3.merge(chartData.map(d => d.gaps.slice().map(s => { return {name: d.name, start: s.start, end: s.end, gradientId: d.gradientId}; }))))
           .join("line")
             .attr("x1", d => x(d.start))
             .attr("x2", d => x(d.end || x.domain()[1]))
@@ -105,10 +109,11 @@ var timelineChart = function () {
           .selectAll("line")
           // .data(chartData)
           // .data(d3.merge(chartData.map(d => d.spans.slice())))
-          .data(d3.merge(chartData.map(d => d.spans.slice().map(s => { return {name: d.name, start: s.start, end: s.end}; }))))
+          .data(d3.merge(chartData.map(d => d.spans.slice().map(s => { return {name: d.name, start: s.start, end: s.end, gradientId: d.gradientId}; }))))
           .join("line")
             .attr("stroke", "black")
-            .attr("stroke-opacity", d => d.end === x.domain()[1] ? null : 0.7)
+            // .attr("stroke", d => d.end === x.domain()[1] ? "black" : d.gradientId)
+            // .attr("stroke-opacity", d => d.end === x.domain()[1] ? null : 0.7)
             .attr("x1", d => x(d.start))
             .attr("x2", d => x(d.end || x.domain()[1]))
             .attr("y1", d => y(d.name) + 0.5)
