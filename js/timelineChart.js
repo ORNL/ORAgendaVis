@@ -45,26 +45,23 @@ var timelineChart = function () {
         const g = svg.append('g')
           .attr('transform', `translate(${margin.left},${margin.top})`);
 
-        const x = d3.scaleUtc()
+        const x = d3.scaleLinear()
           .domain([d3.min(chartData, d => d.start), endDate])
           .rangeRound([0, width]);
-        console.log(x.domain());
-        // console.log(x.rangeRound());
 
         const y = d3.scalePoint()
           .domain(chartData.map(d => d.name))
           .rangeRound([0, height])
           .padding(1);
-        console.log(y.domain());
         
         const xAxis = g => g
-          .call(d3.axisTop(x).ticks(width / 80))
+          .call(d3.axisTop(x).ticks(x.domain()[1] - x.domain()[0]).tickFormat(x => `FY${x.toFixed(4).substring(2,4)}`))
           .call(g => g.select(".domain").remove())
           .call(g => g.append("g")
               .attr("stroke", "white")
               .attr("stroke-width", 2)
             .selectAll("line")
-            .data(x.ticks(d3.timeYear.every(1)))
+            .data(x.ticks(x.domain()[1] - x.domain()[0]))
             .join("line")
               .attr("x1", d => 0.5 + x(d))
               .attr("x2", d => 0.5 + x(d))
@@ -87,28 +84,31 @@ var timelineChart = function () {
         // console.log(d3.merge(chartData.map(d => d.spans)));
 
         const gapLines = g.append("g")
-            .attr("stroke-width", 1)
+            .attr("stroke-width", 1.5)
             .attr("stroke-linecap", "round")
             .attr("stroke-linejoin", "round")
-            .attr("stroke-dasharray", "2,2")
+            .attr("stroke-dasharray", "1,4")
+            .attr("stroke", "#777")
           .selectAll("line")
-          .data(d3.merge(chartData.map(d => d.gaps)))
+          // .data(d3.merge(chartData.map(d => d.gaps)))
+          .data(d3.merge(chartData.map(d => d.gaps.slice().map(s => { return {name: d.name, start: s.start, end: s.end}; }))))
           .join("line")
-            .attr("stroke", "#444")
             .attr("x1", d => x(d.start))
             .attr("x2", d => x(d.end || x.domain()[1]))
             .attr("y1", d => y(d.name) + 0.5)
             .attr("y2", d => y(d.name) + 0.5);
 
-        const line = g.append("g")
+        const spanLines = g.append("g")
             .attr("stroke-width", 2)
             .attr("stroke-linecap", "round")
             .attr("stroke-linejoin", "round")
           .selectAll("line")
           // .data(chartData)
-          .data(d3.merge(chartData.map(d => d.spans)))
+          // .data(d3.merge(chartData.map(d => d.spans.slice())))
+          .data(d3.merge(chartData.map(d => d.spans.slice().map(s => { return {name: d.name, start: s.start, end: s.end}; }))))
           .join("line")
             .attr("stroke", "black")
+            .attr("stroke-opacity", d => d.end === x.domain()[1] ? null : 0.7)
             .attr("x1", d => x(d.start))
             .attr("x2", d => x(d.end || x.domain()[1]))
             .attr("y1", d => y(d.name) + 0.5)
@@ -127,23 +127,20 @@ var timelineChart = function () {
             .attr("x", d => x(d.start) - 6)
             .attr("y", d => y(d.name))
             .attr("dy", "0.35em")
-            .attr("fill-opacity", d => {
-              // console.log(d.end.getFullYear());
-              // console.log(x.domain()[1].getFullYear());
-              return d.end.getFullYear() === x.domain()[1].getFullYear() ? null : 0.6
-            })
-            .attr("font-weight", d => d.end.getFullYear() === x.domain()[1].getFullYear() ? "bold" : null)
+            .attr("fill-opacity", d => d.end === x.domain()[1] ? null : 0.7)
+            .attr("font-weight", d => d.end === x.domain()[1] ? "bold" : null)
+            // .attr("font-weight", d => d.end.getFullYear() === x.domain()[1].getFullYear() ? "bold" : null)
             // .attr("fill-opacity", d => d.end === null ? null : 0.6)
             .text(d => d.name);
 
-        // const dot = g.append("g")
-        //     .attr("fill", "black")
-        //   .selectAll("circle")
-        //   .data(chartData.filter(d => d.end != null))
-        //   .join("circle")
-        //     .attr("cx", d => x(d.end))
-        //     .attr("cy", d => y(d.name) + 0.5)
-        //     .attr("r", 2);
+        const dot = g.append("g")
+            .attr("fill", "black")
+          .selectAll("circle")
+          .data(chartData.filter(d => d.end !== x.domain()[1]))
+          .join("circle")
+            .attr("cx", d => x(d.end))
+            .attr("cy", d => y(d.name) + 0.5)
+            .attr("r", 3);
 
         
 
