@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<html>
+  <head>
+    <!-- <script src="https://d3js.org/d3.v5.min.js"></script> -->
+    <script src="js/d3.v5.min.js"></script>
+    <script src="js/d3-array.v2.min.js"></script>
+    <!-- <script src="https://d3js.org/d3-array.v2.min.js"></script> -->
+    <script type="text/javascript" src="js/timelineChartOld.js"></script>
+
+    <link rel="apple-touch-icon" href="./favicon.png">
+    <link rel="icon" type="image/png" href="./favicon.png">
+    <link rel="icon" type="image/png" href="./favicon.png">
+    <link rel="shortcut icon" href="./favicon.ico">
+    
+    <style>
+      body {
+        font: 12px sans-serif;
+        margin: 4px 20px 0px 20px;
+        /* background: gray; */
+        background-color: whitesmoke;
+      }
+
+      table {
+        width: 100%;
+      }
+
+      #logo {
+        text-align: right;
+      }
+    </style>
+  </head>
+
+  <body>
+    <table>
+      <tr>
+        <td><h1>ORNL Lab Agenda Initiatives (2001-2020)</h1></td>
+        <td id="logo"><img src="image/vista-logo.png" height=80 alt="ORNL VISTA Vis Lab"></img></td>
+      </tr>
+    </table>
+    <div id="chart"></div>
+
+    <br/><br/>
+    <center>
+      <h4>&copy; <a href="https://www.ornl.gov">Oak Ridge National Laboratory</a>
+          <script type="text/javascript">
+              document.write(new Date().getFullYear());
+          </script>
+      </h4>
+    </center>
+    <br/>
+    <br/>
+  </body>
+
+  <script>
+    const chartMargin = {top:30, right:16, bottom:10, left:220};
+    const chartHeight = 640;
+    let chartData;
+
+    const createChart = () => {
+      const divWidth = document.getElementById('chart').clientWidth;
+      const chart = timelineChart()
+        .margin(chartMargin)
+        .width(divWidth)
+        .height(chartHeight);
+      d3.select('#chart').call(chart, chartData);
+    };
+
+    // d3.csv("data/candidates.csv", d3.autoType)
+    //   .then(data => {
+    //     console.log(data);
+    //     chartData = data;
+    //     createChart();
+    //   })
+    //   .catch(error => {
+    //     console.log(error);
+    //   });
+
+    d3.csv("data/initiatives-chad.csv", d3.autoType)
+      .then(data => {
+        // data = data.map(d => {
+        //   d.chad = d.chad.toLowerCase();
+        //   return d;
+        // });
+
+        const initiatives = d3.group(data, d => d.chad);
+        chartData = [];
+        
+        initiatives.forEach((value, initiative) => {
+
+          const categories = d3.csvParseRows(initiative)[0];
+
+          const years = [...new Set(value.map(d => d.year).sort(d3.ascending))];
+
+          const spans = [];
+          const gaps = [];
+          if (years.length === 1) {
+            spans.push({
+              start: years[0], 
+              end: years[0] + 1
+            });
+          } else {
+            let s = [years[0]];
+            for (let i = 1; i < years.length; i++) {
+              if (years[i] - s[s.length-1] > 1) {
+                spans.push({
+                  start: s[0], 
+                  end: s[s.length-1] + 1
+                });
+                gaps.push({
+                  start:s[s.length-1] + 1, 
+                  end:years[i]
+                });
+                s = [years[i]];
+              } else {
+                s.push(years[i]);
+              }
+            }
+            spans.push({
+              start: s[0], 
+              end: s[s.length-1] + 1
+            });
+          }
+          
+          spans.map(s => {
+            s.name = initiative,
+            s.categories = categories,
+            s.start = new Date(s.start, 0, 0);
+            s.end = new Date(s.end, 0, 1);
+          });
+          gaps.map(g => {
+            g.name = initiative,
+            g.categories = categories,
+            g.start = new Date(g.start, 0, 0);
+            g.end = new Date(g.end, 0, 0);
+          });
+
+          const yearRange = d3.extent(value, d => d.year);
+          chartData.push({
+            name: initiative,
+            categories, categories,
+            spans: spans,
+            gaps: gaps,
+            start: new Date(yearRange[0], 0),
+            end: new Date(yearRange[1] + 1, 0)
+          });
+        });
+        // console.log(chartData);
+
+        // chartData = chartData.filter(d => d.categories.length > 1);
+        // chartData = chartData.filter(d => d.categories.includes("biology") || d.categories.includes("climate") || d.categories.includes("environmental"));
+
+        console.log(chartData.length);
+        chartData = sortInitiatives(chartData);
+        console.log(chartData.length);
+        console.log(chartData);
+
+        createChart();
+      })
+      .catch(error => {
+        console.log(error);
+      });
+
+      const orders = ({
+        Start: (a, b) => d3.ascending(a.start, b.start),
+        End: (a, b) => d3.ascending(a.end || today, b.end || today) || d3.ascending(a.start, b.start),
+        Duration: (a, b) => d3.descending((a.end || today) - a.start, (b.end || today) - b.start)
+      });
+
+      const getInitiativesWithKeyword = (data, keyword) => {
+        initiatives = [];
+        data.forEach(d => {
+          if (!initiatives.includes(d)) {
+            if (d.name.includes(keyword)) {
+              initiatives.push(d);
+            }
+          }
+        });
+        return initiatives;
+      }
+      const sortInitiatives = (data) => {
+        var initiativePriorities = [
+          "neutrons",
+          "hpc",
+          "materials",
+          "nuclear",
+          "isotopes",
+          "biology",
+          "environmental",
+          "climate",
+          "manufacturing",
+          "national security",
+          "tech transfer",
+          "science culture"
+        ];
+        var newData = [];
+
+        initiativePriorities.forEach(keyword => {
+          let initiatives = getInitiativesWithKeyword(data, keyword);
+          initiatives.sort(orders.Start);
+          if (initiatives.length > 0) {
+            initiatives.forEach(d => {
+              if (!newData.includes(d)) {
+                newData.push(d);
+              }
+            });
+          }  
+        });
+
+        // var initiatives = getInitiativesWithKeyword(data, "neutrons");
+        // if (initiatives.length > 0) {
+        //   initiatives.forEach(d => {
+        //     if (!newData.includes(d)) {
+        //       newData.push(d);
+        //     }
+        //   });
+        // }
+
+        // var initiatives = getInitiativesWithKeyword(data, "hpc");
+        // if (initiatives.length > 0) {
+        //   initiatives.forEach(d => {
+        //     if (!newData.includes(d)) {
+        //       newData.push(d);
+        //     }
+        //   });
+        // }
+
+        // var initiatives = getInitiativesWithKeyword(data, "materials");
+        // if (initiatives.length > 0) {
+        //   initiatives.forEach(d => {
+        //     if (!newData.includes(d)) {
+        //       newData.push(d);
+        //     }
+        //   });
+        // }
+
+        // data.forEach(d => {
+        //   if (!newData.includes(d)) {
+        //     if (d.name.includes("neutrons")) {
+        //       newData.push(d);
+        //     }
+        //   }
+        // });
+
+        // data.forEach(d => {
+        //   if (!newData.includes(d)) {
+        //     if (d.name.includes("hpc")) {
+        //       newData.push(d);
+        //     }
+        //   }
+        // });
+
+        let unprioritizedInitiatives = [];
+        data.forEach(d => {
+          if (!newData.includes(d)) {
+            unprioritizedInitiatives.push(d);
+          }
+        });
+        unprioritizedInitiatives.sort(orders.Start);
+
+        // let unprioritizedInitiatives = data.map(d => !newData.includes(d)).sort(orders.Start);
+        console.log(unprioritizedInitiatives.length);
+        console.log(newData.length);
+        unprioritizedInitiatives.forEach(d => {
+          newData.push(d);
+        });
+
+        // data.forEach(d => {
+        //   if (!newData.includes(d)) {
+        //     newData.push(d);
+        //   }
+        // });
+        
+        return newData;
+      }
+  </script>
+</html>
