@@ -3,7 +3,7 @@ var timelineChart = function () {
   let width = 900 - margin.left - margin.right;
   let height = 400 - margin.top - margin.bottom;
 
-  var highlightString = '';
+  var highlightStrings = [];
 
   let chartData;
   let chartDiv;
@@ -16,33 +16,42 @@ var timelineChart = function () {
   let unselectedColor = "gray";
   let normalColor = "#222";
 
+  let endDate;
+  var count = 0;
+
   const orders = ({
     Start: (a, b) => d3.ascending(a.start, b.start),
     End: (a, b) => d3.ascending(a.end || today, b.end || today) || d3.ascending(a.start, b.start),
     Duration: (a, b) => d3.descending((a.end || today) - a.start, (b.end || today) - b.start)
   });
-  // const today = new Date(Date.UTC(2021, 0, 1));
-  // let endDate = new Date(Date.UTC(2021, 0));
-  let endDate;
 
   function chart(selection, data) {
     // chartData = data.slice().sort(orders.Start);
     endDate = d3.max(data, d => d.end);
-    // console.log(endDate);
     chartData = data.slice();
     chartDiv = selection;
     drawChart();
   }
-
-  var count = 0;
 
   function getID(name) {
     const id = "0-" + (name === null ? "" : name + "-") + ++count;
     return id;
   }
 
-  const getColorByName = d => d.name.toLowerCase().includes(highlightString.toLowerCase()) ? selectedColor : unselectedColor;
-  const getOpacityByName = d => d.name.toLowerCase().includes(highlightString.toLowerCase()) ? null : 0.6;
+  const isNameHighlighted = (name) => {
+    for (let i = 0; i < highlightStrings.length; i++) {
+      if (name.toLowerCase().includes(highlightStrings[i])) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  // const getColorByName = d => d.name.toLowerCase().includes(highlightString.toLowerCase()) ? selectedColor : unselectedColor;
+  // const getOpacityByName = d => d.name.toLowerCase().includes(highlightString.toLowerCase()) ? null : 0.6;
+  const getLabelColorByName = d => highlightStrings.length === 0 ? normalColor : isNameHighlighted(d.name) ? selectedColor : unselectedColor;
+  const getLineColorByName = d => highlightStrings.length === 0 ? d.gradientId ? `url(#${d.gradientId})` : normalColor : isNameHighlighted(d.name) ? selectedColor : unselectedColor;
+  const getOpacityByName = d => highlightStrings.length === 0 ? null : isNameHighlighted(d.name) ? null : 0.6;
 
   function drawChart() {
     if (chartData) {
@@ -104,7 +113,8 @@ var timelineChart = function () {
           // .data(d3.merge(chartData.map(d => d.gaps)))
           .data(d3.merge(chartData.map(d => d.gaps.slice().map(s => { return {name: d.name, start: s.start, end: s.end, gradientId: d.gradientId}; }))))
           .join("line")
-            .attr("stroke", d => highlightString.length > 0 ? getColorByName(d) : "#777")
+            .attr("stroke", d => getLineColorByName(d.name))
+            // .attr("stroke", d => highlightString.length > 0 ? getColorByName(d) : "#777")
             .attr("x1", d => x(d.start))
             .attr("x2", d => x(d.end || x.domain()[1]))
             .attr("y1", d => y(d.name) + 0.5)
@@ -120,7 +130,8 @@ var timelineChart = function () {
           .data(d3.merge(chartData.map(d => d.spans.slice().map(s => { return {name: d.name, start: s.start, end: s.end, gradientId: d.gradientId}; }))))
           .join("line")
             // .attr("stroke", "black")
-            .attr("stroke", d => d.gradientId ? `url(#${d.gradientId})` : "black")
+            .attr("stroke", d => getLineColorByName(d))
+            // .attr("stroke", d => d.gradientId ? `url(#${d.gradientId})` : "black")
             // .attr("stroke", d => d.end === x.domain()[1] ? "black" : `url(#${d.gradientId})`)
             // .attr("stroke-opacity", d => d.end === x.domain()[1] ? null : 0.7)
             .attr("x1", d => x(d.start))
@@ -141,8 +152,10 @@ var timelineChart = function () {
             .attr("x", d => x(d.start) - 6)
             .attr("y", d => y(d.name))
             .attr("dy", "0.35em")
-            .attr("fill", d => highlightString.length > 0 ? getColorByName(d) : normalColor)
-            .attr("fill-opacity", d => highlightString.length > 0 ? getOpacityByName(d) : null)
+            .attr("fill", d => getLabelColorByName(d))
+            .attr("fill-opacity", d => getOpacityByName(d))
+            // .attr("fill", d => highlightString.length > 0 ? getColorByName(d) : normalColor)
+            // .attr("fill-opacity", d => highlightString.length > 0 ? getOpacityByName(d) : null)
             // .attr("fill-opacity", d => d.end === x.domain()[1] ? null : 0.7)
             .attr("font-weight", d => d.end === x.domain()[1] ? "bold" : null)
             // .attr("font-weight", d => d.end.getFullYear() === x.domain()[1].getFullYear() ? "bold" : null)
@@ -160,7 +173,8 @@ var timelineChart = function () {
           .selectAll("circle")
           .data(chartData.filter(d => d.end !== x.domain()[1]))
           .join("circle")
-            .attr("fill", d => highlightString.length > 0 ? getColorByName(d) : normalColor)
+            .attr("fill", d => getLabelColorByName(d))
+            // .attr("fill", d => highlightString.length > 0 ? getColorByName(d) : normalColor)
             .attr("cx", d => x(d.end))
             .attr("cy", d => y(d.name) + 0.5)
             .attr("r", 2);
@@ -168,24 +182,51 @@ var timelineChart = function () {
     }
   };
 
-  chart.setHighlightString = function(value) {
+  chart.setHighlightStrings = function(value) {
     if (!arguments.length) {
-      return highlightString;
+      return highlightStrings;
     }
-    highlightString = value;
+    let strings = d3.csvParseRows(value)[0];
+    highlightStrings = [];
+    if (strings) {
+      strings.forEach(s => {
+        if (s.trim().length > 0) {
+          highlightStrings.push(s.trim().toLowerCase());
+        }
+      });
+      // highlightStrings = strings.map(s => s.trim().toLowerCase());
+    }
+    // if (!highlightStrings) highlightStrings = [];
+    // highlightStrings.map(d => d = d.trim().toLowerCase());
+    // console.log(highlightStrings);
+    // highlightString = value;
 
     // highlight span lines, gap lines, and labels of items with names that include the highlightString
     // drawChart();
+    
     if (chartData) {
-      dots.attr("fill", d => highlightString.length > 0 ? getColorByName(d) : normalColor);
-      labels
-        .attr("fill", d => highlightString.length > 0 ? getColorByName(d) : normalColor)
-        .attr("fill-opacity", d => highlightString.length > 0 ? getOpacityByName(d) : null);
-      spanLines
-        .attr('stroke', d => highlightString.length > 0 ? getColorByName(d) : d.gradientId ? `url(#${d.gradientId})` : normalColor)
-        .attr('opacity', d => highlightString.length > 0 ? getOpacityByName(d) : null);
-      gapLines
-        .attr("stroke", d => highlightString.length > 0 ? getColorByName(d) : "#777");
+      // labels.attr("fill", d => {
+      //   if (isNameHighlighted(d.name)) {
+      //     console.log(`${d.name} is highlighted`);
+      //   }
+      //   return getColorByName(d);
+      // })
+      dots.attr("fill", d => getLabelColorByName(d));
+      labels.attr("fill", d => getLabelColorByName(d))
+        .attr("fill-opacity", d => getOpacityByName(d));
+      spanLines.attr("stroke", d => getLineColorByName(d))
+        .attr("stroke-opacity", d => getOpacityByName(d));
+      gapLines.attr("stroke", d => getLineColorByName(d));
+
+      // dots.attr("fill", d => highlightString.length > 0 ? getColorByName(d) : normalColor);
+      // labels
+      //   .attr("fill", d => highlightString.length > 0 ? getColorByName(d) : normalColor)
+      //   .attr("fill-opacity", d => highlightString.length > 0 ? getOpacityByName(d) : null);
+      // spanLines
+      //   .attr('stroke', d => highlightString.length > 0 ? getColorByName(d) : d.gradientId ? `url(#${d.gradientId})` : normalColor)
+      //   .attr('opacity', d => highlightString.length > 0 ? getOpacityByName(d) : null);
+      // gapLines
+      //   .attr("stroke", d => highlightString.length > 0 ? getColorByName(d) : "#777");
 
       // if (highlightString.length === 0) {
       //   labels.attr('fill', normalColor);

@@ -43,7 +43,7 @@
       </tr>
     </table>
 
-    <label for="searchText">Type to Highlight Themes: </label>
+    <label for="searchText">Type to Highlight Themes (use commas to highlight multiple themes): </label>
     <input id="searchText" type="text"></input><br/><br/>
 
     <div id="chart"></div>
@@ -70,7 +70,7 @@
       const textValue = document.getElementById("searchText").value;
       // console.log(textValue);
       if (chart) {
-        chart.setHighlightString(textValue);
+        chart.setHighlightStrings(textValue);
       }
     };
 
