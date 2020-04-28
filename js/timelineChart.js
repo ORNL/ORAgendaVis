@@ -3,8 +3,18 @@ var timelineChart = function () {
   let width = 900 - margin.left - margin.right;
   let height = 400 - margin.top - margin.bottom;
 
+  var highlightString = '';
+
   let chartData;
   let chartDiv;
+  let gapLines;
+  let spanLines;
+  let labels;
+  let dots;
+
+  let selectedColor = "mediumblue";
+  let unselectedColor = "gray";
+  let normalColor = "#222";
 
   const orders = ({
     Start: (a, b) => d3.ascending(a.start, b.start),
@@ -18,7 +28,7 @@ var timelineChart = function () {
   function chart(selection, data) {
     // chartData = data.slice().sort(orders.Start);
     endDate = d3.max(data, d => d.end);
-    console.log(endDate);
+    // console.log(endDate);
     chartData = data.slice();
     chartDiv = selection;
     drawChart();
@@ -28,16 +38,17 @@ var timelineChart = function () {
 
   function getID(name) {
     const id = "0-" + (name === null ? "" : name + "-") + ++count;
-    console.log(id);
     return id;
-    // return "0-" + (name === null ? "" : name + "-") + ++count;
   }
+
+  const getColorByName = d => d.name.toLowerCase().includes(highlightString.toLowerCase()) ? selectedColor : unselectedColor;
+  const getOpacityByName = d => d.name.toLowerCase().includes(highlightString.toLowerCase()) ? null : 0.6;
 
   function drawChart() {
     if (chartData) {
       chartDiv.selectAll('*').remove();
       if (chartData) {      
-        console.log(endDate);
+        // console.log(endDate);
 
         const svg = chartDiv.append('svg')
           .attr('width', width + margin.left + margin.right)
@@ -70,8 +81,6 @@ var timelineChart = function () {
           .call(g => g.selectAll(".tick text")
             .attr("font-size", 12));
         
-        console.log(chartData.filter(d => d.end !== x.domain()[1]));
-
         g.append("defs")
           .selectAll("linearGradient")
           // .data(chartData.filter(d => d.end !== null))
@@ -85,24 +94,23 @@ var timelineChart = function () {
             .call(g => g.append("stop").attr("stop-color", "black"))
             .call(g => g.append("stop").attr("offset", "100%").attr("stop-color", "#aaa"));
         
-        // console.log(d3.merge(chartData.map(d => d.spans)));
-
-        const gapLines = g.append("g")
+        gapLines = g.append("g")
             .attr("stroke-width", 1.5)
             // .attr("stroke-linecap", "round")
             .attr("stroke-linejoin", "round")
             .attr("stroke-dasharray", "2,4")
-            .attr("stroke", "#777")
+            // .attr("stroke", "#777")
           .selectAll("line")
           // .data(d3.merge(chartData.map(d => d.gaps)))
           .data(d3.merge(chartData.map(d => d.gaps.slice().map(s => { return {name: d.name, start: s.start, end: s.end, gradientId: d.gradientId}; }))))
           .join("line")
+            .attr("stroke", d => highlightString.length > 0 ? getColorByName(d) : "#777")
             .attr("x1", d => x(d.start))
             .attr("x2", d => x(d.end || x.domain()[1]))
             .attr("y1", d => y(d.name) + 0.5)
             .attr("y2", d => y(d.name) + 0.5);
 
-        const spanLines = g.append("g")
+        spanLines = g.append("g")
             .attr("stroke-width", 2)
             // .attr("stroke-linecap", "round")
             .attr("stroke-linejoin", "round")
@@ -123,7 +131,7 @@ var timelineChart = function () {
         g.append("g")
           .call(xAxis);
 
-        const label = g.append("g")
+        labels = g.append("g")
             .attr("font-family", "sans-serif")
             .attr("font-size", 14)
             .attr("text-anchor", "end")
@@ -133,26 +141,69 @@ var timelineChart = function () {
             .attr("x", d => x(d.start) - 6)
             .attr("y", d => y(d.name))
             .attr("dy", "0.35em")
-            .attr("fill-opacity", d => d.end === x.domain()[1] ? null : 0.7)
+            .attr("fill", d => highlightString.length > 0 ? getColorByName(d) : normalColor)
+            .attr("fill-opacity", d => highlightString.length > 0 ? getOpacityByName(d) : null)
+            // .attr("fill-opacity", d => d.end === x.domain()[1] ? null : 0.7)
             .attr("font-weight", d => d.end === x.domain()[1] ? "bold" : null)
             // .attr("font-weight", d => d.end.getFullYear() === x.domain()[1].getFullYear() ? "bold" : null)
             // .attr("fill-opacity", d => d.end === null ? null : 0.6)
             .text(d => d.name);
 
-        const dot = g.append("g")
-            .attr("fill", "black")
+        // if (highlightString.length > 0) {
+        //   labels.attr('fill', getColorByName);
+          // spanLines.attr('stroke', getColorByName);
+          // gapLines.attr('stroke', getColorByName);
+        // }
+
+        dots = g.append("g")
+            // .attr("fill", "black")
           .selectAll("circle")
           .data(chartData.filter(d => d.end !== x.domain()[1]))
           .join("circle")
+            .attr("fill", d => highlightString.length > 0 ? getColorByName(d) : normalColor)
             .attr("cx", d => x(d.end))
             .attr("cy", d => y(d.name) + 0.5)
             .attr("r", 2);
-
-        
-
       }
     }
   };
+
+  chart.setHighlightString = function(value) {
+    if (!arguments.length) {
+      return highlightString;
+    }
+    highlightString = value;
+
+    // highlight span lines, gap lines, and labels of items with names that include the highlightString
+    // drawChart();
+    if (chartData) {
+      dots.attr("fill", d => highlightString.length > 0 ? getColorByName(d) : normalColor);
+      labels
+        .attr("fill", d => highlightString.length > 0 ? getColorByName(d) : normalColor)
+        .attr("fill-opacity", d => highlightString.length > 0 ? getOpacityByName(d) : null);
+      spanLines
+        .attr('stroke', d => highlightString.length > 0 ? getColorByName(d) : d.gradientId ? `url(#${d.gradientId})` : normalColor)
+        .attr('opacity', d => highlightString.length > 0 ? getOpacityByName(d) : null);
+      gapLines
+        .attr("stroke", d => highlightString.length > 0 ? getColorByName(d) : "#777");
+
+      // if (highlightString.length === 0) {
+      //   labels.attr('fill', normalColor);
+      //   labels.attr('fill-opacity', null);
+      //   spanLines.attr("stroke", d => d.gradientId ? `url(#${d.gradientId})` : "black");
+        
+      // } else {
+      //   labels.attr('fill', getColorByName);
+      //   labels.attr('fill-opacity', getOpacityByName);
+      //   spanLines.attr('stroke', getColorByName);
+      //   spanLines.attr('fill-opacity', getOpacityByName);
+      // }
+      // spanLines.attr('fill', getColorByName);
+      // gapLines.attr('fill', getColorByName);
+    }
+
+    return chart;
+  }
 
   chart.margin = function(value) {
     if (!arguments.length) {
