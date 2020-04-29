@@ -71,7 +71,7 @@ var timelineChart = function () {
           .rangeRound([0, width]);
 
         const oneYearWidth = width / (endDate - x.domain()[0]);
-        console.log(oneYearWidth);
+        // console.log(oneYearWidth);
 
         const y = d3.scalePoint()
           .domain(chartData.map(d => d.name))
@@ -110,7 +110,7 @@ var timelineChart = function () {
             .attr("stroke-width", 1.5)
             // .attr("stroke-linecap", "round")
             .attr("stroke-linejoin", "round")
-            .attr("stroke-dasharray", "2,4")
+            .attr("stroke-dasharray", "2,2")
             // .attr("stroke", "#777")
           .selectAll("line")
           // .data(d3.merge(chartData.map(d => d.gaps)))
@@ -192,9 +192,10 @@ var timelineChart = function () {
 
           const linkLines = g.append("g")
             .attr("fill", "none")
-            .attr("stroke", "#999")
-            .attr("stroke-opacity", 0.6)
-            .attr("display", "none");
+            .attr("stroke", normalColor)
+            .attr("stroke-opacity", 0.7)
+            .attr("display", "none")
+            .attr("stroke-dasharray", "4,2");
 
           hoverDot.append("circle").attr("r", 2.5);
 
@@ -212,83 +213,54 @@ var timelineChart = function () {
           }
 
           function moved () {
-            linkLines.selectAll("path").remove();
+            linkLines.selectAll('path').remove();
             d3.event.preventDefault();
             const ym = invertY(d3.mouse(this)[1] - margin.top);
             const xm = Math.round(x.invert(d3.mouse(this)[0] - margin.left));
-            // console.log(chartData.find(d => d.name == ym));
             const hoverTheme = chartData.find(d => d.name === ym);
             if (hoverTheme) {
-              const linkedThemes = hoverTheme.linkedThemes.get(xm);
-              if (linkedThemes) {
-                console.log(linkedThemes);
-              //   gapLines = g.append("g")
-              //   .attr("stroke-width", 1.5)
-              //   // .attr("stroke-linecap", "round")
-              //   .attr("stroke-linejoin", "round")
-              //   .attr("stroke-dasharray", "2,4")
-              //   // .attr("stroke", "#777")
-              // .selectAll("line")
-              // // .data(d3.merge(chartData.map(d => d.gaps)))
-              // .data(d3.merge(chartData.map(d => d.gaps.slice().map(s => { return {name: d.name, start: s.start, end: s.end, gradientId: d.gradientId}; }))))
-              // .join("line")
-              //   .attr("stroke", d => getLineColorByName(d.name))
-              //   // .attr("stroke", d => highlightString.length > 0 ? getColorByName(d) : "#777")
-              //   .attr("x1", d => x(d.start))
-              //   .attr("x2", d => x(d.end || x.domain()[1]))
-              //   .attr("y1", d => y(d.name) + 0.5)
-              //   .attr("y2", d => y(d.name) + 0.5);
+              // console.log(hoverTheme.spans.includes(d => xm >= d.start && xm <= d.end));
+              if (hoverTheme.spans.find(d => xm >= d.start && xm <= d.end)) {
+                hoverTheme.linkedThemes.forEach((links, year) => {
+                  // console.log(links);
 
-              function arc(d) {
-                const y1 = y(ym);
-                const y2 = y(d);
-                const r = Math.abs(y2 - y1) / 2;
-                const rx = r > oneYearWidth ? oneYearWidth : r;
-                return `M${x(xm)},${y1}A${rx},${r} 0,0,${y1 < y2 ? 1 : 0} ${x(xm)},${y2}`;
-              }
+                  function arc(d) {
+                    const y1 = y(ym);
+                    const y2 = y(d);
+                    const r = Math.abs(y2 - y1) / 2;
+                    const rx = r > oneYearWidth ? oneYearWidth : r;
+                    return `M${x(year)},${y1}A${rx},${r} 0,0,${y1 < y2 ? 1 : 0} ${x(year)},${y2}`;
+                  }
 
-              linkLines.selectAll('themeLinks')
-                .data(linkedThemes)
-                .join("path")
-                  .attr("d", arc);
-              // linkLines.selectAll('themelinks')
-              //   .data(linkedThemes)
-              //   .enter().append("path")
-              //     .attr('d', function(d) {
-              //       start = y(ym);
-              //       end = y(d);
+                  linkLines.selectAll('themeLinks')
+                    .data(links)
+                    .join('path')
+                      .attr('d', arc);
 
-              //       // arcLength = (start - end) / 2;
-              //       arcLength = 10;
-              //       return ['M', x(xm), start, 
-              //         'A',
-              //         arcLength, ',',
-              //         arcLength, 0, 0, ',',
-              //         start < end ? 1 : 0, x(xm), ',', end].join(' ');
-              //     });
-                  
-                // linkLines.selectAll("path")
+                });
+                // const linkedThemes = hoverTheme.linkedThemes.get(xm);
+                // if (linkedThemes) {
+                //   console.log(linkedThemes);
+
+                // function arc(d) {
+                //   const y1 = y(ym);
+                //   const y2 = y(d);
+                //   const r = Math.abs(y2 - y1) / 2;
+                //   const rx = r > oneYearWidth ? oneYearWidth : r;
+                //   return `M${x(xm)},${y1}A${rx},${r} 0,0,${y1 < y2 ? 1 : 0} ${x(xm)},${y2}`;
+                // }
+
+                // linkLines.selectAll('themeLinks')
                 //   .data(linkedThemes)
-                //   .append("path")
-                //     .attr("d", d3.linkVertical()
-                //       .x(x(xm))
-                //       .y(d => y(d)));
-                  // .join("path")
-                  //   .attr("d", d3.linkVertical()
-                  //     .x(x(xm))
-                  //     .y(d => y(d)));
-                // linkLines.selectAll("line")
-                //   .data(linkedThemes)
-                //   .join("line")
-                //     .attr("stroke", "blue")
-                //     .attr("x1", x(xm))
-                //     .attr("x2", x(xm))
-                //     .attr("y1", y(ym))
-                //     .attr("y2", d => y(d));
+                //   .join("path")
+                //     .attr("d", arc);
+                // }
+                hoverDot.attr('display', null);
+                hoverDot.attr('transform', `translate(${x(xm)}, ${y(ym)})`);
+              } else {
+                hoverDot.attr('display', 'none');
               }
             }
-            // console.log(`ym: ${ym}  xm: ${xm}`);
-            hoverDot.attr('transform', `translate(${x(xm)}, ${y(ym)})`);
           }
 
           function entered() {
