@@ -61,7 +61,7 @@
   </body>
 
   <script>
-    const chartMargin = {top:30, right:16, bottom:10, left:180};
+    const chartMargin = {top:30, right:20, bottom:10, left:180};
     const chartHeight = 640;
     let chartData;
     let chart;
@@ -84,16 +84,6 @@
         .height(chartHeight);
       d3.select('#chart').call(chart, chartData);
     };
-
-    // d3.csv("data/candidates.csv", d3.autoType)
-    //   .then(data => {
-    //     console.log(data);
-    //     chartData = data;
-    //     createChart();
-    //   })
-    //   .catch(error => {
-    //     console.log(error);
-    //   });
 
     const getRelatedInitiatives = (initiative, initiatives) => {
       const related = new Set();
@@ -119,10 +109,8 @@
         // data = data.filter(d => d.chad.includes("biology") || d.chad.includes("climate") || d.chad.includes("environmental"));
 
         const groupedInitiatives = d3.group(data, d => d.category);
-        // console.log(groupedInitiatives);
 
         const yearExtent = d3.extent(data, d => d.year);
-        // console.log(yearExtent);
         
         var themes = [];
         var initiatives = [];

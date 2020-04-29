@@ -70,6 +70,9 @@ var timelineChart = function () {
           .domain([d3.min(chartData, d => d.start), endDate])
           .rangeRound([0, width]);
 
+        const oneYearWidth = width / (endDate - x.domain()[0]);
+        console.log(oneYearWidth);
+
         const y = d3.scalePoint()
           .domain(chartData.map(d => d.name))
           .rangeRound([0, height])
@@ -162,12 +165,6 @@ var timelineChart = function () {
             // .attr("fill-opacity", d => d.end === null ? null : 0.6)
             .text(d => d.name);
 
-        // if (highlightString.length > 0) {
-        //   labels.attr('fill', getColorByName);
-          // spanLines.attr('stroke', getColorByName);
-          // gapLines.attr('stroke', getColorByName);
-        // }
-
         dots = g.append("g")
             // .attr("fill", "black")
           .selectAll("circle")
@@ -178,6 +175,134 @@ var timelineChart = function () {
             .attr("cx", d => x(d.end))
             .attr("cy", d => y(d.name) + 0.5)
             .attr("r", 2);
+        
+        function hover(svg) {
+          if ("ontouchstart" in document) svg
+            .style("-webkit-tap-highlight-color", "transparent")
+            .on("touchmove", moved)
+            .on("touchstart", entered)
+            .on("touchend", left)
+          else svg
+            .on('mousemove', moved)
+            .on('mouseenter', entered)
+            .on('mouseleave', left);
+
+          const hoverDot = g.append("g")
+            .attr("display", "none");
+
+          const linkLines = g.append("g")
+            .attr("fill", "none")
+            .attr("stroke", "#999")
+            .attr("stroke-opacity", 0.6)
+            .attr("display", "none");
+
+          hoverDot.append("circle").attr("r", 2.5);
+
+          hoverDot.append("text")
+            .attr("font-family", "sans-serif")
+            .attr("font-size", 10)
+            .attr("text-anchor", "middle")
+            .attr("y", -8);
+          
+          function invertY(yPos) {
+            const nameIndex = Math.floor((yPos / y.step()) - 1);
+            nameIndex < 0 ? 0 : nameIndex > (y.domain().length - 1) ? (y.domain().length - 1) : nameIndex;
+            return y.domain()[nameIndex];
+            // return y.domain()[Math.floor((yPos / y.step()) - 0.5)];
+          }
+
+          function moved () {
+            linkLines.selectAll("path").remove();
+            d3.event.preventDefault();
+            const ym = invertY(d3.mouse(this)[1] - margin.top);
+            const xm = Math.round(x.invert(d3.mouse(this)[0] - margin.left));
+            // console.log(chartData.find(d => d.name == ym));
+            const hoverTheme = chartData.find(d => d.name === ym);
+            if (hoverTheme) {
+              const linkedThemes = hoverTheme.linkedThemes.get(xm);
+              if (linkedThemes) {
+                console.log(linkedThemes);
+              //   gapLines = g.append("g")
+              //   .attr("stroke-width", 1.5)
+              //   // .attr("stroke-linecap", "round")
+              //   .attr("stroke-linejoin", "round")
+              //   .attr("stroke-dasharray", "2,4")
+              //   // .attr("stroke", "#777")
+              // .selectAll("line")
+              // // .data(d3.merge(chartData.map(d => d.gaps)))
+              // .data(d3.merge(chartData.map(d => d.gaps.slice().map(s => { return {name: d.name, start: s.start, end: s.end, gradientId: d.gradientId}; }))))
+              // .join("line")
+              //   .attr("stroke", d => getLineColorByName(d.name))
+              //   // .attr("stroke", d => highlightString.length > 0 ? getColorByName(d) : "#777")
+              //   .attr("x1", d => x(d.start))
+              //   .attr("x2", d => x(d.end || x.domain()[1]))
+              //   .attr("y1", d => y(d.name) + 0.5)
+              //   .attr("y2", d => y(d.name) + 0.5);
+
+              function arc(d) {
+                const y1 = y(ym);
+                const y2 = y(d);
+                const r = Math.abs(y2 - y1) / 2;
+                const rx = r > oneYearWidth ? oneYearWidth : r;
+                return `M${x(xm)},${y1}A${rx},${r} 0,0,${y1 < y2 ? 1 : 0} ${x(xm)},${y2}`;
+              }
+
+              linkLines.selectAll('themeLinks')
+                .data(linkedThemes)
+                .join("path")
+                  .attr("d", arc);
+              // linkLines.selectAll('themelinks')
+              //   .data(linkedThemes)
+              //   .enter().append("path")
+              //     .attr('d', function(d) {
+              //       start = y(ym);
+              //       end = y(d);
+
+              //       // arcLength = (start - end) / 2;
+              //       arcLength = 10;
+              //       return ['M', x(xm), start, 
+              //         'A',
+              //         arcLength, ',',
+              //         arcLength, 0, 0, ',',
+              //         start < end ? 1 : 0, x(xm), ',', end].join(' ');
+              //     });
+                  
+                // linkLines.selectAll("path")
+                //   .data(linkedThemes)
+                //   .append("path")
+                //     .attr("d", d3.linkVertical()
+                //       .x(x(xm))
+                //       .y(d => y(d)));
+                  // .join("path")
+                  //   .attr("d", d3.linkVertical()
+                  //     .x(x(xm))
+                  //     .y(d => y(d)));
+                // linkLines.selectAll("line")
+                //   .data(linkedThemes)
+                //   .join("line")
+                //     .attr("stroke", "blue")
+                //     .attr("x1", x(xm))
+                //     .attr("x2", x(xm))
+                //     .attr("y1", y(ym))
+                //     .attr("y2", d => y(d));
+              }
+            }
+            // console.log(`ym: ${ym}  xm: ${xm}`);
+            hoverDot.attr('transform', `translate(${x(xm)}, ${y(ym)})`);
+          }
+
+          function entered() {
+            hoverDot.attr("display", null);
+            linkLines.attr("display", null);
+          }
+
+          function left() {
+            hoverDot.attr("display", "none");
+            linkLines.attr("display", "none");
+          }
+        }
+
+        svg.call(hover);
       }
     }
   };
@@ -194,53 +319,15 @@ var timelineChart = function () {
           highlightStrings.push(s.trim().toLowerCase());
         }
       });
-      // highlightStrings = strings.map(s => s.trim().toLowerCase());
     }
-    // if (!highlightStrings) highlightStrings = [];
-    // highlightStrings.map(d => d = d.trim().toLowerCase());
-    // console.log(highlightStrings);
-    // highlightString = value;
-
-    // highlight span lines, gap lines, and labels of items with names that include the highlightString
-    // drawChart();
     
     if (chartData) {
-      // labels.attr("fill", d => {
-      //   if (isNameHighlighted(d.name)) {
-      //     console.log(`${d.name} is highlighted`);
-      //   }
-      //   return getColorByName(d);
-      // })
       dots.attr("fill", d => getLabelColorByName(d));
       labels.attr("fill", d => getLabelColorByName(d))
         .attr("fill-opacity", d => getOpacityByName(d));
       spanLines.attr("stroke", d => getLineColorByName(d))
         .attr("stroke-opacity", d => getOpacityByName(d));
       gapLines.attr("stroke", d => getLineColorByName(d));
-
-      // dots.attr("fill", d => highlightString.length > 0 ? getColorByName(d) : normalColor);
-      // labels
-      //   .attr("fill", d => highlightString.length > 0 ? getColorByName(d) : normalColor)
-      //   .attr("fill-opacity", d => highlightString.length > 0 ? getOpacityByName(d) : null);
-      // spanLines
-      //   .attr('stroke', d => highlightString.length > 0 ? getColorByName(d) : d.gradientId ? `url(#${d.gradientId})` : normalColor)
-      //   .attr('opacity', d => highlightString.length > 0 ? getOpacityByName(d) : null);
-      // gapLines
-      //   .attr("stroke", d => highlightString.length > 0 ? getColorByName(d) : "#777");
-
-      // if (highlightString.length === 0) {
-      //   labels.attr('fill', normalColor);
-      //   labels.attr('fill-opacity', null);
-      //   spanLines.attr("stroke", d => d.gradientId ? `url(#${d.gradientId})` : "black");
-        
-      // } else {
-      //   labels.attr('fill', getColorByName);
-      //   labels.attr('fill-opacity', getOpacityByName);
-      //   spanLines.attr('stroke', getColorByName);
-      //   spanLines.attr('fill-opacity', getOpacityByName);
-      // }
-      // spanLines.attr('fill', getColorByName);
-      // gapLines.attr('fill', getColorByName);
     }
 
     return chart;
