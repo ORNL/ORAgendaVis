@@ -1,0 +1,164 @@
+﻿year,initiative,category,category1,category2,categoryjack,categorychad
+2001,Complex Biological Systems,biological systems,,,,biology
+2001,Energy and the Environmental Systems of the Future,"energy systems, environmental systems",,,,"energy systems, environmental"
+2001,High-Performance Computing,HPC,,,,hpc
+2001,Advanced Materials,materials,,,,materials
+2001,Neutron Sciences,neutron sciences,,,,neutrons
+2001,University Partnerships,university partnerships,,,,university partnerships
+2002,Complex Biological Systems,biological systems,,,,biology
+2002,Future Research and Development Directions,emerging R&D,,,,emerging r&d
+2002,Energy and the Environmental Systems of the Future,"energy systems, environmental systems",,,,"energy systems, environmental"
+2002,Terascale Computing and Simulation Science,"HPC, simulation science",,,,hpc
+2002,Valuing Human Capital,human capital,,,,human capital
+2002,Advanced Materials,materials,,,,materials
+2002,National Security,national security,,,,national security
+2002,Neutron Sciences,neutron sciences,,,,neutrons
+2002,University Partnerships,university partnerships,,,,university partnerships
+2004,Complex Biological Systems,biological systems,Systems Biology,biology,Biology,biology
+2004,Future Research and Development Directions,emerging R&D,Emerging Research and Development Areas,emerging areas,Emerging R&D,emerging r&d
+2004,Fission to Fusion,"fission science, fusion energy science",Fission to Fusion,?,Fission to Fusion,fission to fusion
+2004,Grid Modernization,grid technology,Advanced Energy Systems,electric grid,Grid Tech,grid technology
+2004,Terascale Computing and Simulation Science,"HPC, simulation science",Terascale Computing,computing,HPC,hpc
+2004,Science and Technology for a Hydrogen Economy,hydrogen,Science and Technology for a Hydrogen Economy,hydrogen,Hydrogen,hydrogen
+2004,Advanced Materials,materials,Advanced Materials,materials,Materials,materials
+2004,National Security,national security,National Security,national security,National Security,national security
+2004,Neutron Sciences,neutron sciences,Neutron Sciences,neutron science,Neutrons,neutrons
+2004,University Partnerships,university partnerships,University Partnerships,university partnerships,Uni Partnerships,university partnerships
+2005,Systems Biology,biological systems,Systems Biology,biology,Biology,biology
+2005,Emerging Research and Development Areas,emerging R&D,Emerging Research and Development Areas,emerging areas,Emerging R&D,emerging r&d
+2005,Advanced Grid Technologies,grid technology,Advanced Energy Systems,electric grid,Grid Tech,grid technology
+2005,Terascale Computing and Simulation Science,"HPC, simulation science",Terascale Computing,computing,HPC,hpc
+2005,Hydrogen Infrastructure,hydrogen,Hydrogen Infrastructure,hydrogen,Hydrogen,hydrogen
+2005,Advanced Materials,materials,Advanced Materials,materials,Materials,materials
+2005,National Security,national security,National Security Science and Technology,national security,National Security,national security
+2005,Neutron Sciences,neutron sciences,Neutron Sciences,neutron science,Neutrons,neutrons
+2005,Space Nuclear,space nuclear,Space Nuclear,?,Space Nuclear,space nuclear
+2005,University Partnerships,university partnerships,University Partnerships,university partnerships,Uni Partnerships,university partnerships
+2006,Systems Biology,biological systems,Systems Biology,biology,Biology,biology
+2006,Advanced Energy Systems,energy systems,Advanced Energy Systems,energy systems,Energy Systems,energy systems
+2006,Ultrascale Computing,HPC,Ultrascale Computing,computing,HPC,hpc
+2006,Advanced Materials,materials,Advanced Materials,materials,Materials,materials
+2006,National Security Science and Technology,national security,National Security Science and Technology,national security,National Security,national security
+2006,Neutron Sciences,neutron sciences,Neutron Sciences,neutron science,Neutrons,neutrons
+2006,University Partnerships,university partnerships,University Partnerships,university partnerships,Uni Partnerships,university partnerships
+2007,Systems Biology,biological systems,Systems Biology,biology,Biology,biology
+2007,Advanced Energy Systems,energy systems,Advanced Energy Systems,energy systems,Energy Systems,energy systems
+2007,ITER and Fusion Energy Sciences,"fusion energy science, ITER",ITER and Fusion Energy Sciences,?,Fusion,"fusion, iter"
+2007,Ultrascale Computing,HPC,Ultrascale Computing,computing,HPC,hpc
+2007,Advanced Materials,materials,Advanced Materials,materials,Materials,materials
+2007,National Security Science and Technology,national security,National Security Science and Technology,national security,National Security,national security
+2007,Neutron Sciences,neutron sciences,Neutron Sciences,neutron science,Neutrons,neutrons
+2007,University Partnerships,university partnerships,University Partnerships,university partnerships,Uni Partnerships,university partnerships
+2008,Systems Biology,biological systems,Systems Biology,biology,Biology,biology
+2008,Advanced Energy Systems,energy systems,Advanced Energy Systems,energy systems,Energy Systems,energy systems
+2008,ITER and Fusion Energy Sciences,"fusion energy science, ITER",ITER and Fusion Energy Sciences,?,Fusion,"fusion, iter"
+2008,Ultrascale Computing,HPC,Ultrascale Computing,computing,HPC,hpc
+2008,Advanced Materials,materials,Advanced Materials,materials,Materials,materials
+2008,National Security Science and Technology,national security,National Security Science and Technology,national security,National Security,national security
+2008,Neutron Sciences,neutron sciences,Neutron Sciences,neutron science,Neutrons,neutrons
+2008,University Partnerships,university partnerships,University Partnerships,university partnerships,Uni Partnerships,university partnerships
+2009,Systems Biology and the Environment,"biological systems, environmental systems",Systems Biology and the Environment,biological and environmental systems,Biology and Environment,"biology, environmental"
+2009,Cross Cutting Initiatives,cross cutting initiatives,Cross Cutting Initiatives,cross cutting initiatives,Cross Cuts,cross cuts
+2009,Advanced Energy Systems and ITER,"energy systems, ITER",Advanced Energy Systems and ITER,energy systems,Energy Systems,"energy systems, iter"
+2009,Ultrascale Computing,HPC,Ultrascale Computing,computing,HPC,hpc
+2009,Advanced Materials,materials,Advanced Materials,materials,Materials,materials
+2009,National Security Science and Technology,national security,National Security Science and Technology,national security,National Security,national security
+2009,Neutron and Nuclear Sciences,"neutron sciences, nuclear systems",Neutron and Nuclear Sciences,neutron and nuclear science,Neutron and Nuclear,"neutrons, nuclear"
+2010,"Climate Change Science, Systems Biology, and Environmental Sustainability","climate, biological systems, environmental systems","Climate Change Science, Systems Biology, and Environmental Sustainability","climate science, biological systems, environmental science",Climate Science,"climate, biology, environmental"
+2010,Energy Security Science and Technology,energy security,Energy Security Science and Technology,?,Energy Systems,energy security
+2010,Graduate Education and University Partnerships,"graduate education, university partnerships",Graduate Education and University Partnerships,?,Grad Ed,"graduate education, university partnerships"
+2010,Ultrascale Computing and Computational Science,"HPC, computational science",Ultrascale Computing,computing,HPC,hpc
+2010,Advanced Materials and Interfacial Processes,materials,Advanced Materials and Interfacial Processes,materials,Materials,materials
+2010,Global Security Science and Technology,national security,Global Security Science and Technology,national security,National Security,national security
+2010,Neutron and Nuclear Sciences,"neutron sciences, nuclear systems",Neutron and Nuclear Sciences,neutron and nuclear science,Neutron and Nuclear,"neutrons, nuclear"
+2011,Achieve breakthroughs in biomass production and conversion for energy and materials,biomass production,biomass production and conversion,biomass production and conversion,Biomass Prod,biomass production
+2011,Advance climate change science and explore solution strategies,climate,Climate Change Science,climate science,Climate Science,climate
+2011,Deliver fusion science and technology for the ITER era,"energy systems, ITER",Advanced Energy Systems and ITER,energy systems,Energy Systems,"energy systems, iter"
+2011,Invigorate science through graduate education,graduate education,Graduate Education,graduate and post-graduate education,Grad Ed,graduate education
+2011,Enable 21st century electric grid technology,grid technology,Enable 21st century electric grid technology,electric grid,Grid Tech,grid technology
+2011,"Scale computers, computational science, and data analytics to the extreme for discovery and innovation","HPC, data analytics, computational science",scale computing and data analytics,computing and data analytics,HPC & Data,"hpc, data"
+2011,Deliver advanced materials for energy applications,materials,material discovery and design,materials,Materials,materials
+2011,Provide science and technology to solve challenges in global security,national security,Global Security Science and Technology,national security,National Security,national security
+2011,Deliver science using neutrons,neutron sciences,advance neutron science impact,neutron science,Neutrons,neutrons
+2011,Achieve transformational nuclear S&T outcomes through coupled experiments and simulations,nuclear systems,Nuclear Science,nuclear science,Neutrons,neutrons
+2012,Achieve breakthroughs in biomass production and conversion for energy and materials,biomass production,biomass production and conversion,biomass production and conversion,Biomass Prod,biomass production
+2012,Advance understanding of climate change impacts,climate,Climate Change Science,climate science,Climate Science,climate
+2012,Invigorate science through graduate research and education,graduate education,Graduate Education,graduate and post-graduate education,Grad Ed,graduate education
+2012,"Scale computing, data infrastructure, and analytics for science","HPC, data analytics, data infrastructure",scale computing and data analytics,computing and data analytics,HPC & Data,"hpc, data"
+2012,Discover and demonstrate advanced materials for energy applications,materials,material discovery and design,materials,Materials,materials
+2012,Provide science and technology to solve challenges in global security,national security,Global Security Science and Technology,national security,National Security,national security
+2012,Deliver science using neutrons,neutron sciences,advance neutron science impact,neutron science,Neutrons,neutrons
+2012,Advance the scientific basis for breakthrough nuclear technologies and systems,nuclear systems,Nuclear Science,nuclear science,Neutrons,neutrons
+2012,Deliver sustainable transportation solutions,transportation,Sustainable transportation solutions,transportation,Transportation,transportation
+2013,"Enhance building energy efficiency, sustainable transportation, and advanced manufacturing","energy systems, transportation, manufacturing, buiding energy efficiency","building efficiency, sustainable transportation, advanced manufacturing","building systems, transportation, advanced manufacturing",Energy Efficiency,"building systems, transportation, advanced manufacturing"
+2013,"Advance understanding in biological, environmental systems, and climate change impacts science","climate, biological systems, environmental systems","Climate Change Science, Systems Biology, and Environmental Sustainability","climate science, biological systems, environmental science",Climate Science,"climate, biology, environmental"
+2013,Invigorate science through graduate and post-graduate research and education,graduate education,Graduate and post-graduate education,graduate and post-graduate education,Grad Ed,graduate education
+2013,"Scale computing, data infrastructure, and analytics for science","HPC, data analytics, data infrastructure",scale computing and data analytics,computing and data analytics,HPC & Data,"hpc, data"
+2013,Discover and demonstrate advanced materials for energy applications,materials,material discovery and design,materials,Materials,materials
+2013,Solve the nation’s most compelling global security challenges,national security,Global Security Science and Technology,national security,National Security,national security
+2013,Deliver science using neutrons,neutron sciences,advance neutron science impact,neutron science,Neutrons,neutrons
+2013,Advance the scientific basis for breakthrough nuclear science and technology,nuclear systems,Nuclear Science,nuclear science,Neutrons,neutrons
+2013,Enhance technology transfer,tech transfer,Enhance technology transfer,technology transfer,Tech Transfer,tech transfer
+2014,"Enhance building energy efficiency, sustainable transportation, and advanced manufacturing","energy systems, transportation, manufacturing, buiding energy efficiency","building efficiency, sustainable transportation, advanced manufacturing","building systems, transportation, advanced manufacturing",Energy Efficiency,"building systems, transportation, advanced manufacturing"
+2014,"Advance understanding in biological, environmental systems, and climate change impacts science","climate, biological systems, environmental systems","Climate Change Science, Systems Biology, and Environmental Sustainability","climate science, biological systems, environmental science",Climate Science,"climate, biology, environmental"
+2014,Invigorate science through graduate and post-graduate research and education,graduate education,Graduate and post-graduate education,graduate and post-graduate education,Grad Ed,graduate education
+2014,"Scale computing, data infrastructure, and analytics for science","HPC, data analytics, data infrastructure",scale computing and data analytics,computing and data analytics,HPC & Data,"hpc, data"
+2014,Discover and demonstrate advanced materials for energy,materials,material discovery and design,materials,Materials,materials
+2014,Deliver science and technology to address complex global security challenges,national security,Global Security Science and Technology,national security,National Security,national security
+2014,Deliver science using neutrons,neutron sciences,advance neutron science impact,neutron science,Neutrons,neutrons
+2014,Advance the scientific basis for breakthrough nuclear technologies and systems,nuclear systems,Nuclear Science,nuclear science,Neutrons,neutrons
+2014,Enhance technology transfer,tech transfer,Enhance technology transfer,technology transfer,Tech Transfer,tech transfer
+2015,"Advance understanding of complexity in biological, environmental and climate systems","climate, biological systems, environmental systems","Climate Change Science, Systems Biology, and Environmental Sustainability","climate science, biological systems, environmental science",Climate Science,"climate, biology, environmental"
+2015,"Accelerate research, development, and manufacturing of integrated energy systems","energy systems, transportation, manufacturing, buiding energy efficiency",integrated energy systems,energy systems,Energy Systems,energy systems
+2015,Scale computing and data analytics for science and energy,"HPC, data analytics",scale computing and data analytics,computing and data analytics,HPC & Data,"hpc, data"
+2015,Accelerate the discovery of new materials for energy,materials,material discovery and design,materials,Materials,materials
+2015,Deliver science and technology to address complex national security challenges,national security,Global Security Science and Technology,national security,National Security,national security
+2015,Advance the science and impact of neutrons,neutron sciences,advance neutron science impact,neutron science,Neutrons,neutrons
+2015,Advance the scientific basis for breakthrough nuclear technologies and systems,nuclear systems,Nuclear Science,nuclear science,Neutrons,neutrons
+2015,Accelerate deployment of DOE technologies,tech transfer,Accelerate deployment of DOE technologies,technology transfer,Tech Transfer,tech transfer
+2016,Advance understanding of complexity in biological and environmental systems,"biological systems, environmental systems",biological and environmental systems,biological and environmental systems,Biology and Environment,"biology, environmental"
+2016,"Discover and develop sustainable and secure integrated energy systems across buildings, transportation, and manufacturing","energy systems, transportation, manufacturing, buiding energy efficiency",integrated energy systems,energy systems,Energy Systems,energy systems
+2016,Scale computing and data analytics to exascale and beyond for science and energy,"HPC, data analytics",exascale computing and data analytics,computing and data analytics,HPC & Data,"hpc, data"
+2016,Accelerate the discovery and design of new materials for energy,materials,material discovery and design,materials,Materials,materials
+2016,Deliver science and technology to address complex security challenges,national security,Global Security Science and Technology,national security,National Security,national security
+2016,Advance the science and impact of neutrons,neutron sciences,advance neutron science impact,neutron science,Neutrons,neutrons
+2016,Advance the scientific basis for breakthrough nuclear technologies and systems,nuclear systems,Nuclear Science,nuclear science,Neutrons,neutrons
+2016,Accelerate deployment of DOE intellectual property and strategic engagement with industry and universities,tech transfer,Accelerate deployment of DOE technologies,technology transfer,Tech Transfer,tech transfer
+2017,"Advance the understanding of complexity in biological, environmental and climate systems","climate, biological systems, environmental systems","Climate Change Science, biological and environmental systems","climate science, biological systems, environmental science",Climate Science,"climate, biology, environmental"
+2017,"Accelerate research, development, and manufacturing of integrated energy systems","energy systems, transportation, manufacturing, buiding energy efficiency",integrated energy systems,energy systems,Energy Systems,energy systems
+2017,Scale computing and data analytics to exascale and beyond for science and energy,"HPC, data analytics",exascale computing and data analytics,computing and data analytics,HPC & Data,"hpc, data"
+2017,Accelerate the discovery and design of new materials for energy,materials,material discovery and design,materials,Materials,materials
+2017,Deliver science and technology to address complex global security challenges,national security,Global Security Science and Technology,national security,National Security,national security
+2017,Advance the science and impact of neutrons,neutron sciences,advance neutron science impact,neutron science,Neutrons,neutrons
+2017,Advance the scientific basis for breakthrough nuclear technologies and systems,nuclear systems,Nuclear Science,nuclear science,Neutrons,neutrons
+2017,Advance ORNL’s science and innovation culture,science & innovation culture,science and innovation culture,ORNL science and innovation culture,Science Culture,science culture
+2017,Accelerate deployment of DOE intellectual property and strategic engagement with industry and universities,tech transfer,Accelerate deployment of DOE technologies,technology transfer,Tech Transfer,tech transfer
+2018,Advance the understanding of complexity in biological and environmental systems,"biological systems, environmental systems",biological and environmental systems,biological and environmental systems,Biology and Environment,"biology, environmental"
+2018,"Accelerate research, development, and manufacturing of integrated energy systems","energy systems, transportation, manufacturing, buiding energy efficiency",integrated energy systems,energy systems,Energy Systems,energy systems
+2018,Scale computing and data analytics to exascale and beyond for science and energy,"HPC, data analytics",exascale computing and data analytics,computing and data analytics,HPC & Data,"hpc, data"
+2018,Accelerate the discovery and design of new materials for energy,materials,material discovery and design,materials,Materials,materials
+2018,Deliver science and technology to address complex global security challenges,national security,Global Security Science and Technology,national security,National Security,national security
+2018,Advance the science and impact of neutrons,neutron sciences,advance neutron science impact,neutron science,Neutrons,neutrons
+2018,Advance the scientific basis for breakthrough nuclear technologies and systems,nuclear systems,Nuclear Science,nuclear science,Neutrons,neutrons
+2018,Advance ORNL’s Science and Innovation Culture,science & innovation culture,science and innovation culture,ORNL science and innovation culture,Science Culture,science culture
+2018,Accelerate deployment of DOE intellectual property and strategic engagement with industry and universities,tech transfer,DOE intellectual property and strategic engagement,technology transfer,Tech Transfer,tech transfer
+2019,Advance the understanding of complexity in biological and environmental systems,"biological systems, environmental systems","Systems Biology, and Environmental Sustainability",biological and environmental systems,Biology and Environment,"biology, environmental"
+2019,"Accelerate research, development, and manufacturing of integrated energy systems","energy systems, transportation, manufacturing, buiding energy efficiency",integrated energy systems,energy systems,Energy Systems,energy systems
+2019,Scale computing and data analytics to exascale and beyond for science and energy,"HPC, data analytics",exascale computing and data analytics,computing and data analytics,HPC & Data,"hpc, data"
+2019,Enhance strategic capabilities in isotope production and R&D,isotopes,isotope production and research and development,"isotope production, research, and development",Isotopes,isotopes
+2019,Accelerate the discovery and design of new materials and chemical processes for energy,"materials, chemical processes",material discovery and design,materials,Materials,materials
+2019,Deliver science and technology to address complex global security challenges,national security,Global Security Science and Technology,national security,National Security,national security
+2019,Advance the science and impact of neutrons,neutron sciences,advance neutron science impact,neutron science,Neutrons,neutrons
+2019,Advance the scientific basis for breakthrough nuclear technologies and systems,nuclear systems,Nuclear Science,nuclear science,Neutrons,neutrons
+2019,Advance ORNL’s science and innovation culture,science & innovation culture,science and innovation culture,ORNL science and innovation culture,Science Culture,science culture
+2019,Accelerate deployment of DOE intellectual property and strategic engagement with industry and universities,tech transfer,DOE intellectual property and strategic engagement,technology transfer,Tech Transfer,tech transfer
+2020,Understand complexity in biological and evironmental systems,"biological systems, environmental systems",biological and environmental systems,biological and environmental systems,Biology and Environment,"biology, environmental"
+2020,"Accelerate research, development, and manufacturing of integrated energy systems","energy systems, transportation, manufacturing, buiding energy efficiency",integrated energy systems,energy systems,Energy Systems,energy systems
+2020,Scale computing and data analytics to exascale and beyond for science and energy,"HPC, data analytics",exascale computing and analytics,computing and data analytics,HPC & Data,"hpc, data"
+2020,Provide strategic capabilities in isotope production and R&D,isotopes,isotope production and research and development,"isotope production, research, and development",Isotopes,isotopes
+2020,Discover and design next generation materials and chemical processes for energy,"materials, chemical processes",material discovery and design,materials,Materials,materials
+2020,Deliver science and technology to address pressing National Security challenges,national security,Global Security Science and Technology,national security,National Security,national security
+2020,Advance impact and application of neutron science,neutron sciences,advance neutron science impact,neutron science,Neutrons,neutrons
+2020,Enhance the scientific basis for breakthrough nuclear technologies and systems,nuclear systems,Nuclear Science,nuclear science,Neutrons,neutrons
+2020,Enhance ORNL's science and innovation culture,science & innovation culture,science and innovation culture,ORNL science and innovation culture,Science Culture,science culture
+2020,Accelerate deployment of DOE intellectual property and strategic engagement with industry,tech transfer,DOE intellectual property and strategic engagement,technology transfer,Tech Transfer,tech transfer

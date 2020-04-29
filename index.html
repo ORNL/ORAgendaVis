@@ -109,7 +109,7 @@
       return [...related];
     }
 
-    d3.csv("data/initiatives-v4.csv", d3.autoType)
+    d3.csv("data/initiatives-v5.csv", d3.autoType)
       .then(data => {
         // data = data.map(d => {
         //   d.chad = d.chad.toLowerCase();
@@ -207,7 +207,8 @@
             otherRelatedInitiatives.map(r => grouping.includes(r) ? null : grouping.push(r));
           });
         });
-        // console.log(initiativeGroups);
+        console.log(initiativeGroups);
+        console.log(initiatives);
 
         initiativeGroups.sort((a,b) => {
           aEnd = d3.max(a, d => d3.max(d.themes, t => t.end));
@@ -249,6 +250,29 @@
         //     }
         //   }
         // });
+
+        // for each theme, get linkages to other themes where the two themes appear in the same initiative by year
+        themes.forEach(theme => {
+          theme.linkedThemes = new Map();
+          initiatives.forEach(initiative => {
+            if (initiative.themes.includes(theme)) {
+              // theme.linkedThemes = [...new Set(theme.linkedThemes.concat(initiative.themes.filter(t => t !== theme)))];
+              const newLinkedThemes = initiative.themes.filter(t => t !== theme).map(d => d.name);
+              if (newLinkedThemes.length > 0) {
+                initiative.years.map(year => {
+                  let yearThemes = theme.linkedThemes.get(year);
+                  if (!yearThemes) {
+                    yearThemes = [];
+                  }
+                  theme.linkedThemes.set(year, [...new Set(yearThemes.concat(newLinkedThemes))]);
+                  // yearThemes = [...new Set(yearThemes.concat(initiative.themes.filter(t => t !== theme)))];
+                  // yearThemes = [...new Set(yearThemes.concat(initiative.themes.filter(t => t !== t)))];
+                });
+              }
+            }
+          });
+        });
+        console.log(themes);
 
         const low_priority_themes = [
           'tech transfer',
