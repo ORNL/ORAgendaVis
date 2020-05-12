@@ -79,7 +79,7 @@ var timelineChart = function () {
           .padding(1);
         
         const xAxis = g => g
-          .call(d3.axisTop(x).ticks(x.domain()[1] - x.domain()[0]).tickFormat(x => `FY${x.toFixed(4).substring(2,4)}`))
+          .call(d3.axisTop(x).ticks(x.domain()[1] - x.domain()[0]).tickFormat(x => `${x.toFixed(4).substring(2,4)}`))
           .call(g => g.select(".domain").remove())
           .call(g => g.append("g")
               .attr("stroke", "white")
@@ -107,10 +107,10 @@ var timelineChart = function () {
             .call(g => g.append("stop").attr("offset", "100%").attr("stop-color", "#aaa"));
         
         gapLines = g.append("g")
-            .attr("stroke-width", 1.5)
+            .attr("stroke-width", 1.2)
             // .attr("stroke-linecap", "round")
             .attr("stroke-linejoin", "round")
-            .attr("stroke-dasharray", "2,2")
+            .attr("stroke-dasharray", "1,2")
             // .attr("stroke", "#777")
           .selectAll("line")
           // .data(d3.merge(chartData.map(d => d.gaps)))
@@ -196,6 +196,11 @@ var timelineChart = function () {
             .attr("stroke-opacity", 0.7)
             .attr("display", "none")
             .attr("stroke-dasharray", "4,2");
+          
+          const linkDots = g.append("g")
+            .attr("fill", normalColor)
+            .attr("fill-opacity", 0.7)
+            .attr("display", "none");
 
           hoverDot.append("circle").attr("r", 2.5);
 
@@ -213,8 +218,11 @@ var timelineChart = function () {
           }
 
           function moved () {
-            linkLines.selectAll('path').remove();
             d3.event.preventDefault();
+
+            linkLines.selectAll('path').remove();
+            linkDots.selectAll('circle').remove();
+
             const ym = invertY(d3.mouse(this)[1] - margin.top);
             const xm = Math.round(x.invert(d3.mouse(this)[0] - margin.left));
             const hoverTheme = chartData.find(d => d.name === ym);
@@ -237,6 +245,12 @@ var timelineChart = function () {
                     .join('path')
                       .attr('d', arc);
 
+                  linkDots.selectAll('dstDots')
+                    .data(links)
+                    .join('circle')
+                      .attr('cx', x(year))
+                      .attr('cy', d => y(d))
+                      .attr('r', 2);
                 });
                 // const linkedThemes = hoverTheme.linkedThemes.get(xm);
                 // if (linkedThemes) {
@@ -265,12 +279,17 @@ var timelineChart = function () {
 
           function entered() {
             hoverDot.attr("display", null);
+            hoverDot.raise();
             linkLines.attr("display", null);
+            linkLines.raise();
+            linkDots.attr("display", null);
+            linkDots.raise();
           }
 
           function left() {
             hoverDot.attr("display", "none");
             linkLines.attr("display", "none");
+            linkDots.attr("display", "none");
           }
         }
 
