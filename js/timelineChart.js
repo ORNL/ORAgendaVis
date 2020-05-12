@@ -82,8 +82,11 @@ var timelineChart = function () {
           .call(d3.axisTop(x).ticks(x.domain()[1] - x.domain()[0]).tickFormat(x => `${x.toFixed(4).substring(2,4)}`))
           .call(g => g.select(".domain").remove())
           .call(g => g.append("g")
-              .attr("stroke", "white")
-              .attr("stroke-width", 2)
+              .attr("stroke", normalColor)
+              .attr("stroke-opacity", 0.2)
+              .attr("stroke-dasharray", "1.5,2")
+              // .attr("stroke", "white")
+              // .attr("stroke-width", 2)
             .selectAll("line")
             .data(x.ticks(x.domain()[1] - x.domain()[0]))
             .join("line")
@@ -165,6 +168,22 @@ var timelineChart = function () {
             // .attr("fill-opacity", d => d.end === null ? null : 0.6)
             .text(d => d.name);
 
+        const themeYears = d3.merge(chartData.map(d => {
+          return d.years.map(y => { return {name: d.name, year: y}; })
+        }));
+        // console.log(themeYears);
+        const yearDots = g.append("g")
+            .selectAll("circle")
+          .data(themeYears)
+          .join("circle")
+            .attr("stroke", "white")
+            .attr("stroke-width", 1.5)
+            .attr("fill", "#777")  
+            // .attr("fill-opacity", 0.5)
+            .attr("cx", d => x(d.year))
+            .attr("cy", d => y(d.name) + 0.5)
+            .attr("r", 2.5);
+
         dots = g.append("g")
             // .attr("fill", "black")
           .selectAll("circle")
@@ -174,7 +193,7 @@ var timelineChart = function () {
             // .attr("fill", d => highlightString.length > 0 ? getColorByName(d) : normalColor)
             .attr("cx", d => x(d.end))
             .attr("cy", d => y(d.name) + 0.5)
-            .attr("r", 2);
+            .attr("r", 3.5);
         
         function hover(svg) {
           if ("ontouchstart" in document) svg
@@ -197,10 +216,10 @@ var timelineChart = function () {
             .attr("display", "none")
             .attr("stroke-dasharray", "4,2");
           
-          const linkDots = g.append("g")
-            .attr("fill", normalColor)
-            .attr("fill-opacity", 0.7)
-            .attr("display", "none");
+          // const linkDots = g.append("g")
+          //   .attr("fill", normalColor)
+          //   .attr("fill-opacity", 0.7)
+          //   .attr("display", "none");
 
           hoverDot.append("circle").attr("r", 2.5);
 
@@ -221,7 +240,7 @@ var timelineChart = function () {
             d3.event.preventDefault();
 
             linkLines.selectAll('path').remove();
-            linkDots.selectAll('circle').remove();
+            // linkDots.selectAll('circle').remove();
 
             const ym = invertY(d3.mouse(this)[1] - margin.top);
             const xm = Math.round(x.invert(d3.mouse(this)[0] - margin.left));
@@ -245,12 +264,12 @@ var timelineChart = function () {
                     .join('path')
                       .attr('d', arc);
 
-                  linkDots.selectAll('dstDots')
-                    .data(links)
-                    .join('circle')
-                      .attr('cx', x(year))
-                      .attr('cy', d => y(d))
-                      .attr('r', 2);
+                  // linkDots.selectAll('dstDots')
+                  //   .data(links)
+                  //   .join('circle')
+                  //     .attr('cx', x(year))
+                  //     .attr('cy', d => y(d))
+                  //     .attr('r', 2);
                 });
                 // const linkedThemes = hoverTheme.linkedThemes.get(xm);
                 // if (linkedThemes) {
@@ -282,14 +301,14 @@ var timelineChart = function () {
             hoverDot.raise();
             linkLines.attr("display", null);
             linkLines.raise();
-            linkDots.attr("display", null);
-            linkDots.raise();
+            // linkDots.attr("display", null);
+            // linkDots.raise();
           }
 
           function left() {
             hoverDot.attr("display", "none");
             linkLines.attr("display", "none");
-            linkDots.attr("display", "none");
+            // linkDots.attr("display", "none");
           }
         }
 
