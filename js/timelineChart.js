@@ -70,7 +70,7 @@ var timelineChart = function () {
           .domain([d3.min(chartData, d => d.start), endDate])
           .rangeRound([0, width]);
 
-        const oneYearWidth = width / (endDate - x.domain()[0]);
+        const oneYearWidth = 0.5 * (width / (endDate - x.domain()[0]));
         // console.log(oneYearWidth);
 
         const y = d3.scalePoint()
@@ -172,17 +172,17 @@ var timelineChart = function () {
           return d.years.map(y => { return {name: d.name, year: y}; })
         }));
         // console.log(themeYears);
-        const yearDots = g.append("g")
-            .selectAll("circle")
-          .data(themeYears)
-          .join("circle")
-            .attr("stroke", "white")
-            .attr("stroke-width", 1.5)
-            .attr("fill", "#777")  
-            // .attr("fill-opacity", 0.5)
-            .attr("cx", d => x(d.year))
-            .attr("cy", d => y(d.name) + 0.5)
-            .attr("r", 2.5);
+        // const yearDots = g.append("g")
+        //     .selectAll("circle")
+        //   .data(themeYears)
+        //   .join("circle")
+        //     .attr("stroke", "white")
+        //     .attr("stroke-width", 1.5)
+        //     .attr("fill", "#777")  
+        //     // .attr("fill-opacity", 0.5)
+        //     .attr("cx", d => x(d.year))
+        //     .attr("cy", d => y(d.name) + 0.5)
+        //     .attr("r", 2.5);
 
         dots = g.append("g")
             // .attr("fill", "black")
