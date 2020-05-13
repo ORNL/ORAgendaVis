@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<html>
+  <head>
+    <!-- <script src="https://d3js.org/d3.v5.min.js"></script> -->
+    <script src="js/d3.v5.min.js"></script>
+    <script src="js/d3-array.v2.min.js"></script>
+    <!-- <script src="https://d3js.org/d3-array.v2.min.js"></script> -->
+    <script type="text/javascript" src="js/timelineChart.js"></script>
+
+    <link rel="apple-touch-icon" href="./favicon.png">
+    <link rel="icon" type="image/png" href="./favicon.png">
+    <link rel="icon" type="image/png" href="./favicon.png">
+    <link rel="shortcut icon" href="./favicon.ico">
+    
+    <style>
+      body {
+        font: 12px sans-serif;
+        margin: 4px 20px 0px 20px;
+        /* background: gray; */
+        background-color: white;
+      }
+
+      table {
+        width: 100%;
+      }
+
+      #logo {
+        text-align: right;
+      }
+    </style>
+  </head>
+
+  <body>
+    <table>
+      <tr>
+        <td>
+          <h2>ORNL Lab Agenda S&amp;T Initiative Themes (2000-2020)</h2>
+          <h3>Strategic Objective: Excellence in Laboratory Operations and ES&amp;H</h3>
+        </td>
+
+        <td id="logo"><a href="https://vis.ornl.gov/" target="_blank"><img src="image/vista-logo.png" height=70 alt="ORNL VISTA Vis Lab"></img></a></td>
+      </tr>
+    </table>
+
+    <label for="searchText">Type to Highlight Themes (use commas to highlight multiple themes):&nbsp;&nbsp;</label>
+    <input id="searchText" type="text"></input><br/><br/>
+
+    <div id="chart"></div>
+
+    <br/><br/>
+    <center>
+      <h4>&copy; <a href="https://www.ornl.gov">Oak Ridge National Laboratory</a>
+          <script type="text/javascript">
+              document.write(new Date().getFullYear());
+          </script>
+      </h4>
+    </center>
+    <br/>
+    <br/>
+  </body>
+
+  <script>
+    const chartMargin = {top:30, right:20, bottom:10, left:240};
+    const chartHeight = 640;
+    let chartData;
+    let chart;
+
+    const searchTextInputHandler = () => {
+      const textValue = document.getElementById("searchText").value;
+      // console.log(textValue);
+      if (chart) {
+        chart.setHighlightStrings(textValue);
+      }
+    };
+
+    document.getElementById('searchText').addEventListener('input', searchTextInputHandler);
+
+    const createChart = () => {
+      const divWidth = document.getElementById('chart').clientWidth;
+      chart = timelineChart()
+        .margin(chartMargin)
+        .width(divWidth)
+        .height(chartHeight);
+      d3.select('#chart').call(chart, chartData);
+    };
+
+    const getRelatedInitiatives = (initiative, initiatives) => {
+      const related = new Set();
+      initiatives.forEach(otherInitiative => {
+        if (initiative !== otherInitiative) {
+          initiative.themes.forEach(theme => {
+            if (otherInitiative.themes.includes(theme)) {
+              related.add(otherInitiative);
+            }
+          });
+        }
+      });
+      return [...related];
+    }
+
+    d3.csv("data/lab_operations_initiatives_v1.csv", d3.autoType)
+      .then(data => {
+        console.log(data);
+        // data = data.map(d => {
+        //   d.chad = d.chad.toLowerCase();
+        //   return d;
+        // });
+
+        // data = data.filter(d => d.chad.includes("biology") || d.chad.includes("climate") || d.chad.includes("environmental"));
+
+        const groupedInitiatives = d3.group(data, d => d.category);
+        // console.log(groupedInitiatives);
+        const yearExtent = d3.extent(data, d => d.year);
+        // console.log(yearExtent);
+        
+        var themes = [];
+        var initiatives = [];
+        groupedInitiatives.forEach((values, initiativeName) => {
+          const years = values.map(d => d.year).sort(d3.ascending);
+          const priorities = values.map(d => d.priority).sort(d3.ascending);
+          const themeNames = d3.csvParseRows(initiativeName)[0].map(d => d.trim());
+
+          var initiativeThemes = [];
+          themeNames.forEach(themeName => {
+            var theme = themes.find(t => t.name === themeName);
+            if (!theme) {
+              theme = { 
+                name: themeName, 
+                years: [],
+                priorities: values.map(d => d.priority)
+              };
+              themes.push(theme);
+            }
+            theme.years = [...new Set(years.concat(theme.years))].sort(d3.ascending);
+            theme.priorities = [...new Set(priorities.concat(theme.priorities))].sort(d3.descending);
+            initiativeThemes.push(theme);
+          });
+
+          initiatives.push({
+            name: initiativeName,
+            themes: initiativeThemes,
+            years: years
+          });
+        });
+        // console.log(initiatives);
+
+        themes.forEach(theme => {
+          theme.priority = d3.mean(theme.priorities);
+          theme.spans = [];
+          theme.gaps = [];
+          if (theme.years.length === 1) {
+            theme.spans.push({
+              start: theme.years[0],
+              end: theme.years[0] + 1
+            });
+          } else {
+            let s = [theme.years[0]];
+            for (let i = 1; i < theme.years.length; i++) {
+              if (theme.years[i] - s[s.length-1] > 1) {
+                theme.spans.push({
+                  start: s[0], 
+                  end: s[s.length-1] + 1
+                });
+                theme.gaps.push({
+                  start: s[s.length-1] + 1, 
+                  end: theme.years[i]
+                });
+                s = [theme.years[i]];
+              } else {
+                s.push(theme.years[i]);
+              }
+            }
+            theme.spans.push({
+              start: s[0], 
+              end: s[s.length-1] + 1
+            });
+          }
+          theme.start = d3.min(theme.spans.map(d => d.start));
+          theme.end = d3.max(theme.spans.map(d => d.end));
+        });
+        // console.log(themes);
+
+        var initiativeGroups = [];
+        initiatives.forEach(initiative => {
+          var grouping = null;
+          for (let i = 0; i < initiativeGroups.length; i++) {
+            var idx = initiativeGroups[i].findIndex(g => g.name === initiative.name);
+            if (idx !== -1) {
+              grouping = initiativeGroups[i];
+              break;
+            }
+          }
+
+          if (!grouping) {
+            grouping = [initiative];
+            initiativeGroups.push(grouping);
+          }
+
+          relatedInitiatives = getRelatedInitiatives(initiative, initiatives);
+          relatedInitiatives.map(d => {
+            grouping.includes(d) ? null : grouping.push(d);
+            otherRelatedInitiatives = getRelatedInitiatives(d, initiatives);
+            otherRelatedInitiatives.map(r => grouping.includes(r) ? null : grouping.push(r));
+          });
+        });
+        // console.log(initiativeGroups);
+        // console.log(initiatives);
+
+        initiativeGroups.sort((a,b) => {
+          aEnd = d3.max(a, d => d3.max(d.themes, t => t.end));
+          bEnd = d3.max(b, d => d3.max(d.themes, t => t.end));
+
+          if (aEnd === bEnd) {
+            return b.length - a.length;
+          } else {
+            return bEnd - aEnd;
+          }
+        });
+
+        // var orderedThemes = [];
+        // initiativeGroups.forEach(initiativeGroup => {
+        //   initiativeThemes = [...new Set(initiativeGroup.map(d => d.themes).flat(1))];
+        //   initiativeThemes.sort((a,b) => d3.ascending(a.start, b.start));
+        //   orderedThemes = orderedThemes.concat(initiativeThemes);
+        // });
+        // console.log(orderedThemes);
+        // chartData = orderedThemes;
+        // createChart();
+
+        // themes.sort((a,b) => {
+        //   if (a.end > yearExtent[1] && b.end > yearExtent[1]) {
+        //     if (a.start === b.start) {
+        //       return d3.ascending(a.end - a.start, b.end - b.start);
+        //     }
+        //     return d3.ascending(a.start, b.start);
+        //   } else {
+        //     if (a.end > yearExtent[1]) {
+        //       return -1;
+        //     } else if (b.end > yearExtent[1]) {
+        //       return 1;
+        //     } else {
+        //       if (a.start === b.start) {
+        //         return d3.descending(a.end - a.start, b.end - b.start);
+        //       }
+        //       return d3.ascending(a.start, b.start);
+        //     }
+        //   }
+        // });
+
+        // for each theme, get linkages to other themes where the two themes appear in the same initiative by year
+        themes.forEach(theme => {
+          theme.linkedThemes = new Map();
+          initiatives.forEach(initiative => {
+            if (initiative.themes.includes(theme)) {
+              // theme.linkedThemes = [...new Set(theme.linkedThemes.concat(initiative.themes.filter(t => t !== theme)))];
+              const newLinkedThemes = initiative.themes.filter(t => t !== theme).map(d => d.name);
+              if (newLinkedThemes.length > 0) {
+                initiative.years.map(year => {
+                  let yearThemes = theme.linkedThemes.get(year);
+                  if (!yearThemes) {
+                    yearThemes = [];
+                  }
+                  theme.linkedThemes.set(year, [...new Set(yearThemes.concat(newLinkedThemes))]);
+                  // yearThemes = [...new Set(yearThemes.concat(initiative.themes.filter(t => t !== theme)))];
+                  // yearThemes = [...new Set(yearThemes.concat(initiative.themes.filter(t => t !== t)))];
+                });
+              }
+            }
+          });
+        });
+        // console.log(themes);
+
+        const sortThemes = (a, b) => {
+          // console.log(a.priority);
+          if (a.priority === b.priority) {
+          // if (low_priority_themes.includes(a.name) && low_priority_themes.includes(b.name)) {
+            if (a.start === b.start) {
+              return d3.descending(a.end - a.start, b.end - b.start);
+            }
+            return d3.ascending(a.start, b.start);
+          } else {
+            return d3.ascending(a.priority, b.priority);
+            // if (low_priority_themes.includes(a.name)) {
+            //   return 1;
+            // } else if (low_priority_themes.includes(b.name)) {
+            //   return -1;
+            // } else {
+            //   if (a.start === b.start) {
+            //     return d3.descending(a.end - a.start, b.end - b.start);
+            //   }
+            //   return d3.ascending(a.start, b.start);
+            // }
+          }
+        }
+        var activeThemes = themes.filter(theme => theme.end > yearExtent[1]);
+        activeThemes.sort(sortThemes);
+        const inactiveThemes = themes.filter(theme => !(theme.end > yearExtent[1]));
+        inactiveThemes.sort(sortThemes);
+
+        chartData = activeThemes.concat(inactiveThemes);
+        console.log(chartData);
+        createChart();
+        // const themes = [...new Set(d3.merge(data.map(d => d3.csvParseRows(d.chad)[0].map(d => d.trim()))))];
+
+
+        /*
+        const initiatives = d3.group(data, d => d.chad);
+        console.log(initiatives);
+
+        chartData = [];
+        
+        initiatives.forEach((value, initiative) => {
+
+          const categories = d3.csvParseRows(initiative)[0];
+
+          const years = [...new Set(value.map(d => d.year).sort(d3.ascending))];
+
+          const spans = [];
+          const gaps = [];
+          if (years.length === 1) {
+            spans.push({
+              start: years[0], 
+              end: years[0] + 1
+            });
+          } else {
+            let s = [years[0]];
+            for (let i = 1; i < years.length; i++) {
+              if (years[i] - s[s.length-1] > 1) {
+                spans.push({
+                  start: s[0], 
+                  end: s[s.length-1] + 1
+                });
+                gaps.push({
+                  start:s[s.length-1] + 1, 
+                  end:years[i]
+                });
+                s = [years[i]];
+              } else {
+                s.push(years[i]);
+              }
+            }
+            spans.push({
+              start: s[0], 
+              end: s[s.length-1] + 1
+            });
+          }
+          
+          spans.map(s => {
+            s.name = initiative,
+            s.categories = categories,
+            s.start = new Date(s.start, 0, 0);
+            s.end = new Date(s.end, 0, 1);
+          });
+          gaps.map(g => {
+            g.name = initiative,
+            g.categories = categories,
+            g.start = new Date(g.start, 0, 0);
+            g.end = new Date(g.end, 0, 0);
+          });
+
+          const yearRange = d3.extent(value, d => d.year);
+          chartData.push({
+            name: initiative,
+            categories, categories,
+            spans: spans,
+            gaps: gaps,
+            start: new Date(yearRange[0], 0),
+            end: new Date(yearRange[1] + 1, 0)
+          });
+        });
+
+        console.log(chartData.length);
+        chartData = sortInitiatives(chartData);
+        console.log(chartData.length);
+        console.log(chartData);
+
+        createChart();
+        */
+      })
+      .catch(error => {
+        console.log(error);
+      });
+
+      const orders = ({
+        Start: (a, b) => d3.ascending(a.start, b.start),
+        End: (a, b) => d3.ascending(a.end || today, b.end || today) || d3.ascending(a.start, b.start),
+        Duration: (a, b) => d3.descending((a.end || today) - a.start, (b.end || today) - b.start)
+      });
+
+      const getInitiativesWithKeyword = (data, keyword) => {
+        initiatives = [];
+        data.forEach(d => {
+          if (!initiatives.includes(d)) {
+            if (d.name.includes(keyword)) {
+              initiatives.push(d);
+            }
+          }
+        });
+        return initiatives;
+      }
+      const sortInitiatives = (data) => {
+        var initiativePriorities = [
+          "neutrons",
+          "hpc",
+          "materials",
+          "nuclear",
+          "isotopes",
+          "biology",
+          "environmental",
+          "climate",
+          "manufacturing",
+          "national security",
+          "tech transfer",
+          "science culture"
+        ];
+        var newData = [];
+
+        initiativePriorities.forEach(keyword => {
+          let initiatives = getInitiativesWithKeyword(data, keyword);
+          initiatives.sort(orders.Start);
+          if (initiatives.length > 0) {
+            initiatives.forEach(d => {
+              if (!newData.includes(d)) {
+                newData.push(d);
+              }
+            });
+          }  
+        });
+
+        // var initiatives = getInitiativesWithKeyword(data, "neutrons");
+        // if (initiatives.length > 0) {
+        //   initiatives.forEach(d => {
+        //     if (!newData.includes(d)) {
+        //       newData.push(d);
+        //     }
+        //   });
+        // }
+
+        // var initiatives = getInitiativesWithKeyword(data, "hpc");
+        // if (initiatives.length > 0) {
+        //   initiatives.forEach(d => {
+        //     if (!newData.includes(d)) {
+        //       newData.push(d);
+        //     }
+        //   });
+        // }
+
+        // var initiatives = getInitiativesWithKeyword(data, "materials");
+        // if (initiatives.length > 0) {
+        //   initiatives.forEach(d => {
+        //     if (!newData.includes(d)) {
+        //       newData.push(d);
+        //     }
+        //   });
+        // }
+
+        // data.forEach(d => {
+        //   if (!newData.includes(d)) {
+        //     if (d.name.includes("neutrons")) {
+        //       newData.push(d);
+        //     }
+        //   }
+        // });
+
+        // data.forEach(d => {
+        //   if (!newData.includes(d)) {
+        //     if (d.name.includes("hpc")) {
+        //       newData.push(d);
+        //     }
+        //   }
+        // });
+
+        let unprioritizedInitiatives = [];
+        data.forEach(d => {
+          if (!newData.includes(d)) {
+            unprioritizedInitiatives.push(d);
+          }
+        });
+        unprioritizedInitiatives.sort(orders.Start);
+
+        // let unprioritizedInitiatives = data.map(d => !newData.includes(d)).sort(orders.Start);
+        console.log(unprioritizedInitiatives.length);
+        console.log(newData.length);
+        unprioritizedInitiatives.forEach(d => {
+          newData.push(d);
+        });
+
+        // data.forEach(d => {
+        //   if (!newData.includes(d)) {
+        //     newData.push(d);
+        //   }
+        // });
+        
+        return newData;
+      }
+  </script>
+</html>
